@@ -1,0 +1,265 @@
+.\" This document is in the public domain.
+.\" vim: fdm=marker cms=.\\"\ %s
+.
+.\" FRONT MATTER {{{
+.Dd Feb 28, 2015
+.Os
+.Dt MOTOCONF 1
+.
+.Sh NAME
+.Nm motoconf
+.Nd Simple build configuration tool
+.\" FRONT MATTER }}}
+.
+.\" SYNOPSIS {{{
+.Sh SYNOPSIS
+.Nm
+.Fl h | \-help
+.Nm
+.Ar INPUT
+.Op Fl \-prefix Ns = Ns Ar PFX
+.Op Ar NAME Ns = Ns Ar VALUE Ns ...
+.\" SYNOPSIS }}}
+.
+.\" DESCRIPTION {{{
+.Sh DESCRIPTION
+.Nm
+is a simple
+build configuration tool influenced by
+.Xr autoconf 1 .
+.Nm
+creates output files from user-supplied templates,
+substituting all occurrences of user-declared placeholders
+with their corresponding values.
+The input script-provided defaults can be selectively overriden
+on the command line.
+This interface deliberately mimics
+.Xr autoconf 1 Ns -generated
+.Pa configure
+scripts.
+The input script deliberately deviates from
+.Xr autoconf 1
+being a POSIX
+.Xr sh 1
+script using
+.Nm Ns -provided
+functions.
+It should open with a call to
+.Ic register_values ,
+and close with
+.Dq Ic populate Pa Makefile
+or equivalent.
+.
+.Ss Motoconf Options
+These options, if provided, must come before any
+.Ar INPUT
+argument.
+.Bl -tag -width "xx"
+.It Fl h
+Display usage string.
+.It Fl \-help
+Display manual page.
+.El
+.
+.Ss Project Options
+These options, if provided, must come after the
+.Ar INPUT
+argument.
+.Bl -tag -width "xx"
+.It Fl \-prefix Ns Li = Ns Ar PFX
+Install files under
+.Pa PFX
+instead of the default
+.Pa /usr/local .
+Sets
+.Li @prefix@ .
+.El
+.Ss Placeholders
+Placeholders are
+.Li @ Ns -delimited
+words (shell parameter names) occurring in output file templates.
+Placeholder names are registered in the input script with
+.Ic register_values .
+Input script containing
+.Bd -literal -offset "xx"
+register_values string NAME VALUE
+
+.Ed
+instructs
+.Nm
+to replace, when copying output file templates into their destinations,
+all occurrences of
+.Li @NAME@
+with
+.Li VALUE .
+.
+Builtin placeholders are
+.Li PATH ,
+.Li prefix ,
+and
+.Li srcdir .
+.Li @PATH@
+is substituted with the value of
+.Ev $PATH ,
+.Li @prefix@
+is substituted with the value given with
+.Fl \-prefix ,
+and
+.Li @srcdir@
+is substituted with the result of
+.Bd -literal -offset "xx"
+$(dirname "$1")
+.Ed
+.
+.Ss Functions
+.Bl -tag -width "xx"
+. It Ic register_values Ar KIND Ar NAME Ar VALUE Oo Ar KIND Ar NAME Ar VALUE Oc Ns ...
+Takes a list of triplets, each specifying rules for handling the value,
+the placeholder to replace in templates,
+and the value replacing it.
+. Bl -tag -width "" -compact
+.  It Ar KIND
+.  Bl -bullet -compact
+.   It
+.    Li program
+.    Bd -ragged -compact
+Check that
+.     Ar VALUE
+names an executable file.
+If
+.     Ar VALUE
+contains no slash, it is looked up in
+.     Ev $PATH .
+If this check fails,
+.     Nm
+aborts.
+.    Ed
+.   It
+.    Li string
+.    Bd -ragged -compact
+No special processing.
+.    Ed
+.  El
+.  It Ar NAME
+Placeholder name.
+.  It Ar VALUE
+Any string.
+. El
+. It Ic first_in_path Ar FILE Ns ...
+Takes a list of filenames, and returns the first that could be found in
+.  Ev $PATH .
+.It Ic create_script Ar FILE
+Takes a pathname and clobbers it with the contents of the standard input.
+Performs placeholder substitutions.
+.It Ic populate Ar FILE
+Takes a pathname and clobbers it with the contents of
+. Ar FILE Ns .in .
+Performs placeholder substitutions.
+.El
+.\" DESCRIPTION }}}
+.
+.\" EXIT STATUS {{{
+.Sh EXIT STATUS
+.Ex -std
+.\" EXIT STATUS }}}
+.
+.\" EXAMPLES {{{
+.Sh EXAMPLES
+The entire input script
+.Pq Pa moto.conf :
+.
+.Bd -literal -offset "xx"
+register_values \\
+  program CC "$(first_in_path gcc clang)" \\
+  string CFLAGS "-std=c99 -fPIC -Wall -Wextra -Wfatal-errors" \\
+  string CPPFLAGS "-D_POSIX_C_SOURCE=200809L" \\
+  program LD "\\$CC" \\
+  string LDFLAGS "" \\
+  string LIBS "" \\
+  program CRAMCMD "$(first_in_path cram cram3 cram2)" \\
+  program RST2HTMLCMD "$(first_in_path rst2html rst2html.py)"
+  string RST2HTML --strict
+
+create_script mk-obj <<-'EOF'
+	#!/bin/sh
+	target="$1"; shift
+	exec @CC@ @CPPFLAGS@ @CFLAGS@ -c -o"$target" "$@"
+EOF
+create_script mk-exe <<-'EOF'
+	#!/bin/sh
+	target="$1"; shift
+	exec @LD@ @LDFLAGS@ -L"$PWD" -o"$target" "$@" @LIBS@
+EOF
+create_script mk-so <<-'EOF'
+	#!/bin/sh
+	target="$1"; shift
+	exec @LD@ --shared -Wl,--soname="$target" @LDFLAGS@ -o"$target" "$@" @LIBS@
+EOF
+create_script mk-html <<-'EOF'
+	#!/bin/sh
+	exec @RST2HTMLCMD@ @RST2HTML@ "$@"
+EOF
+create_script mk-runtests <<-'EOF'
+	#!/bin/sh
+	exec env -i CRAM="$CRAM" PATH="@PATH@:@srcdir@/tests:$PWD" @CRAMCMD@ @srcdir@/tests
+EOF
+
+populate GNUmakefile
+
+.Ed
+.
+.Pa GNUmakefile.in ,
+used by the
+.Ic populate
+call at the end of
+.Pa moto.conf
+would include the following rules:
+.
+.Bd -literal -offset "xx"
+VPATH = @srcdir@
+
+check:
+	./mk-runtests
+%.html: %.rest
+	./mk-html $< $@
+%.o: %.c
+	./mk-obj $@ $^
+$(name): $(objects_exe) $(canonical)
+	./mk-exe $@ $(objects_exe) -l$(name)
+$(soname): $(objects_lib)
+	./mk-so $@ $(objects_lib)
+$(canonical): $(soname)
+	ln -sf $< $@
+
+.Ed
+.
+The above inputs would be used in
+.Bd -literal -offset "xx"
+% motoconf moto.conf
+
+.Ed
+to generate
+.Pa GNUmakefile
+as well as the auxiliary tools
+.Pq Pa mk-runtests , mk-html , mk-obj , mk-exe , mk-so .
+.\" EXAMPLES }}}
+.
+.\" SEE ALSO {{{
+.Sh SEE ALSO
+.Xr autoconf 1 ,
+.Xr make 1 ,
+.Xr sh 1 .
+.\" SEE ALSO }}}
+.
+.\" AUTHORS {{{
+.Sh AUTHORS
+.An Roman Neuhauser Aq Mt neuhauser+motoconf@sigpipe.cz
+.Lk https://github.com/roman-neuhauser/motoconf/
+.\" AUTHORS }}}
+.
+.\" BUGS {{{
+.Sh BUGS
+No doubt plentiful.
+Please report them at
+.Lk https://github.com/roman-neuhauser/motoconf/issues
+.\" BUGS }}}

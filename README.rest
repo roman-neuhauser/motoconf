@@ -1,0 +1,173 @@
+.. vim: ft=rst sts=2 sw=2 tw=77
+
+.. :Author: Roman Neuhauser
+.. :Contact: neuhauser+git-pimp@sigpipe.cz
+.. :Copyright: This document is in the public domain.
+
+.. this file is marked up using reStructuredText
+   lines beginning with ".." are reST directives
+   "foo_" or "`foo bar`_" is a link, defined at ".. _foo" or ".. _foo bar"
+   "::" introduces a literal block (usually some form of code)
+   "`foo`" is some kind of identifier
+   suspicious backslashes in the text ("`std::string`\s") are required for
+   reST to recognize the preceding character as syntax
+
+.. default-role:: strong
+.. parsed-literal::
+
+  `NAME`
+     `motoconf` — Simple build configuration tool
+
+  `SYNOPSIS`
+     `motoconf` -h | --help
+     `motoconf` INPUT [--prefix=PFX] [NAME=VALUE...]
+
+  `DESCRIPTION`
+     `motoconf` is a simple build configuration tool influenced by *autoconf(1)*.
+     `motoconf` creates output files from user-supplied templates, substituting
+     all occurrences of user-declared placeholders with their corresponding
+     values.  The input script-provided defaults can be selectively overriden
+     on the command line.  This interface deliberately mimics *autoconf(1)*
+     -generated configure scripts.  The input script deliberately deviates
+     from *autoconf(1)* being a POSIX *sh(1)* script using `motoconf`-provided
+     functions.  It should open with a call to `register_values`, and close
+     with `populate Makefile` or equivalent.
+
+   `Motoconf Options`
+     These options, if provided, must come before any `INPUT` argument.
+
+     `-h`  Display usage string.
+
+     `--help`
+           Display manual page.
+
+   `Project Options`
+     These options, if provided, must come after the `INPUT` argument.
+
+     `--prefix=PFX`
+         Install files under `PFX` instead of the default `/usr/local`.
+         Sets `@prefix@`.
+
+   `Placeholders`
+     Placeholders are @-delimited words (shell parameter names) occurring in
+     output file templates.  Placeholder names are registered in the input
+     script with `register_values`.  Input script containing
+
+       register_values string NAME VALUE
+
+     instructs `motoconf` to replace, when copying output file templates into
+     their destinations, all occurrences of `@NAME@` with `VALUE`.  Builtin
+     placeholders are `PATH`, `prefix`, and `srcdir`.  `@PATH@` is substituted
+     with the value of `$PATH`, `@prefix@` is substituted with the value given
+     with `--prefix`, and `@srcdir@` is substituted with the result of
+
+       $(dirname "$1")
+
+   `Functions`
+     `register_values` KIND NAME VALUE [KIND NAME VALUE]...
+         Takes a list of triplets, each specifying rules for handling the
+         value, the placeholder to replace in templates, and the value replac‐
+         ing it.
+
+         `KIND`
+           `program`
+             Check that VALUE names an executable file.  If VALUE contains
+             no slash, it is looked up in $PATH.  If this check fails,
+             `motoconf` aborts.
+           `string`
+             No special processing.
+         `NAME`
+           Placeholder name.
+         `VALUE`
+           Any string.
+
+     `first_in_path` FILE...
+         Takes a list of filenames, and returns the first that could be found
+         in $PATH.
+
+     `create_script` FILE
+         Takes a pathname and clobbers it with the contents of the standard
+         input.  Performs placeholder substitutions.
+
+     `populate` FILE
+         Takes a pathname and clobbers it with the contents of FILE.in.  Per‐
+         forms placeholder substitutions.
+
+  `EXIT STATUS`
+     The `motoconf` utility exits 0 on success, and >0 if an error occurs.
+
+  `EXAMPLES`
+     The entire input script (moto.conf):
+
+       register_values \\
+         program CC "$(first_in_path gcc clang)" \\
+         string CFLAGS "-std=c99 -fPIC -Wall -Wextra -Wfatal-errors" \\
+         string CPPFLAGS "-D_POSIX_C_SOURCE=200809L" \\
+         program LD "\$CC" \\
+         string LDFLAGS "" \\
+         string LIBS "" \\
+         program CRAMCMD "$(first_in_path cram cram3 cram2)" \\
+         program RST2HTMLCMD "$(first_in_path rst2html rst2html.py)"
+         string RST2HTML --strict
+
+       create_script mk-obj <<-'EOF'
+               #!/bin/sh
+               target="$1"; shift
+               exec @CC@ @CPPFLAGS@ @CFLAGS@ -c -o"$target" "$@"
+       EOF
+       create_script mk-exe <<-'EOF'
+               #!/bin/sh
+               target="$1"; shift
+               exec @LD@ @LDFLAGS@ -L"$PWD" -o"$target" "$@" @LIBS@
+       EOF
+       create_script mk-so <<-'EOF'
+               #!/bin/sh
+               target="$1"; shift
+               exec @LD@ --shared -Wl,--soname="$target" @LDFLAGS@ -o"$target" "$@" @LIBS@
+       EOF
+       create_script mk-html <<-'EOF'
+               #!/bin/sh
+               exec @RST2HTMLCMD@ @RST2HTML@ "$@"
+       EOF
+       create_script mk-runtests <<-'EOF'
+               #!/bin/sh
+               exec env -i CRAM="$CRAM" PATH="@PATH@:@srcdir@/tests:$PWD" @CRAMCMD@ @srcdir@/tests
+       EOF
+
+       populate GNUmakefile
+
+     GNUmakefile.in, used by the `populate` call at the end of moto.conf would
+     include the following rules:
+
+       VPATH = @srcdir@
+
+       check:
+               ./mk-runtests
+       %.html: %.rest
+               ./mk-html $< $@
+       %.o: %.c
+               ./mk-obj $@ $^
+       $(name): $(objects_exe) $(canonical)
+               ./mk-exe $@ $(objects_exe) -l$(name)
+       $(soname): $(objects_lib)
+               ./mk-so $@ $(objects_lib)
+       $(canonical): $(soname)
+               ln -sf $< $@
+
+     The above inputs would be used in
+
+       % motoconf moto.conf
+
+     to generate GNUmakefile as well as the auxiliary tools (mk-runtests,
+     mk-html, mk-obj, mk-exe, mk-so).
+
+  `SEE ALSO`
+     autoconf(1), make(1), sh(1).
+
+  `AUTHORS`
+     Roman Neuhauser <neuhauser+motoconf@sigpipe.cz>
+           https://github.com/roman-neuhauser/motoconf/
+
+  `BUGS`
+     No doubt plentiful.  Please report them at
+           https://github.com/roman-neuhauser/motoconf/issues
