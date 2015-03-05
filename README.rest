@@ -1,7 +1,7 @@
 .. vim: ft=rst sts=2 sw=2 tw=77
 
 .. :Author: Roman Neuhauser
-.. :Contact: neuhauser+git-pimp@sigpipe.cz
+.. :Contact: neuhauser+motoconf@sigpipe.cz
 .. :Copyright: This document is in the public domain.
 
 .. this file is marked up using reStructuredText
