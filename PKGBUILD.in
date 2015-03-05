@@ -1,0 +1,29 @@
+# Maintainer: Roman Neuhauser <neuhauser+motoconf@sigpipe.cz>
+pkgname=motoconf
+pkgver=__VERSION__
+pkgrel=1
+pkgdesc="Simple build configuration tool"
+arch=(any)
+url="https://github.com/roman-neuhauser/$pkgname"
+license=(MIT)
+checkdepends=(cram)
+source=($pkgname-$pkgver.tar.gz)
+sha1sums=(SKIP)
+
+build() {
+  _make
+}
+
+check() {
+  _make check
+}
+
+package() {
+  _make install DESTDIR="$pkgdir/"
+}
+
+_make() {
+  cd "$srcdir/$pkgname-$pkgver"
+  make PREFIX=/usr "$@"
+}
+

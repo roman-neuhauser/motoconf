@@ -1,0 +1,36 @@
+# norootforbuild
+# Maintainer: Roman Neuhauser <neuhauser+motoconf@sigpipe.cz>
+
+Name:           motoconf
+Version:        __VERSION__
+Release:        0
+License:        MIT
+Summary:        Simple build configuration tool
+Url:            https://github.com/roman-neuhauser/%{name}
+Group:          Development/Tools
+Source:         %{name}-%{version}.tar.gz
+BuildRequires:  filesystem
+BuildArch:      noarch
+BuildRoot:      %_tmppath/%name-%version-build
+BuildRequires:  cram
+
+%define motoconf_make  make PREFIX=%{_prefix}
+%description
+Simple build configuration tool influenced by GNU autoconf.
+
+%prep
+%setup -q
+
+%build
+%motoconf_make
+
+%check
+%motoconf_make check
+
+%install
+%motoconf_make install DESTDIR=%{buildroot}
+
+%files
+%defattr(-,root,root)
+%{_bindir}/motoconf
+%{_mandir}/man1/motoconf.1.gz
