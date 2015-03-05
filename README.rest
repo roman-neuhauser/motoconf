@@ -20,7 +20,9 @@
 
   `SYNOPSIS`
      `motoconf` -h | --help
+     `motoconf` -c INPUT
      `motoconf` INPUT [--prefix=PFX] [NAME=VALUE...]
+     `configure` [--prefix=PFX] [NAME=VALUE...]
 
   `DESCRIPTION`
      `motoconf` is a simple build configuration tool influenced by *autoconf(1)*.
@@ -34,7 +36,8 @@
      with `populate Makefile` or equivalent.
 
    `Motoconf Options`
-     These options, if provided, must come before any `INPUT` argument.
+     `-c INPUT`
+           Create a file named `configure` in current working directory.
 
      `-h`  Display usage string.
 

@@ -133,15 +133,36 @@ errormsg() # {{{
   printf >&2 "$@"
 } # }}}
 
+create_configure() # {{{
+{
+  cat >configure <<-EOF
+	#!/bin/sh
+	cfg="$1"
+	dir="\$(dirname "\$0")"
+	exec motoconf "\$dir/\$cfg" "\$@"
+EOF
+  chmod +x configure
+} # }}}
+
 exit_code=0
 want_help=0
 want_man=0
 want_usage=0
+want_configure=0
 verbosity=0
 prefix=/usr/local
 
 # process arguments {{{
 case "$1" in
+-c)
+  if (( $# == 2 )) && [ -f "$2" ]; then
+    want_configure=1
+    shift
+  else
+    errormsg "the '-c' option requires an INPUT script\n" "$_SELF"
+    want_usage=1
+  fi
+;;
 -h) want_usage=1 ;;
 --help) want_man=1 ;;
 esac
@@ -153,6 +174,11 @@ if (( 0 == want_usage && 0 == want_man )); then
     errormsg "%s: file not found\n" "$script"
     exit 1
   }
+
+  if (( want_configure )); then
+    create_configure "$script"
+    exit
+  fi
 
   while (( $# )); do # {{{
     case "$1" in
@@ -189,7 +215,9 @@ fi
 # }}}
 
 if (( want_usage )); then # {{{
-  errormsg "usage: %s [-h|--help] INPUT [--prefix=PFX] [NAME=VALUE...]\n" "$_SELF"
+  errormsg "usage: %s [-h|--help]\n" "$_SELF"
+  errormsg "usage: %s -c INPUT\n" "$_SELF"
+  errormsg "usage: %s INPUT [--prefix=PFX] [NAME=VALUE...]\n" "$_SELF"
   exit $exit_code
 fi # }}}
 if (( want_man )); then # {{{

@@ -16,7 +16,12 @@
 .Nm
 .Fl h | \-help
 .Nm
+.Fl c Ar INPUT
+.Nm
 .Ar INPUT
+.Op Fl \-prefix Ns = Ns Ar PFX
+.Op Ar NAME Ns = Ns Ar VALUE Ns ...
+.Nm configure
 .Op Fl \-prefix Ns = Ns Ar PFX
 .Op Ar NAME Ns = Ns Ar VALUE Ns ...
 .\" SYNOPSIS }}}
@@ -51,10 +56,9 @@ and close with
 or equivalent.
 .
 .Ss Motoconf Options
-These options, if provided, must come before any
-.Ar INPUT
-argument.
 .Bl -tag -width "xx"
+.It Fl c Ar INPUT
+Create a file named `configure` in current working directory.
 .It Fl h
 Display usage string.
 .It Fl \-help

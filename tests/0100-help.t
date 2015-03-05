@@ -14,7 +14,9 @@ test
 ::
 
   $ motoconf -h
-  motoconf: usage: motoconf [-h|--help] INPUT [--prefix=PFX] [NAME=VALUE...]
+  motoconf: usage: motoconf [-h|--help]
+  motoconf: usage: motoconf -c INPUT
+  motoconf: usage: motoconf INPUT [--prefix=PFX] [NAME=VALUE...]
 
   $ cat >man <<'EOF'
   > #!/bin/sh
