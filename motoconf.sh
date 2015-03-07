@@ -7,12 +7,12 @@ _SELF=${0##*/}
 
 register_values() # {{{
 {
-  while (( $# > 2 )); do
+  while [ $# -gt 2 ]; do
     register_$1 "$2" "$3"
     shift 3
   done
 
-  if (( want_help )); then # {{{
+  if [ $want_help -ne 0 ]; then # {{{
     printf "Supported variables and their current values:\n"
     local val
     for var in $variables; do
@@ -25,7 +25,7 @@ register_values() # {{{
     check_program $prog
   done
 
-  if (( want_help )); then # {{{
+  if [ $want_help -ne 0 ]; then # {{{
     exit
   fi # }}}
 } # }}}
@@ -121,7 +121,7 @@ chatty() # {{{
 {
   local v=${1#-}
   shift
-  if (( ${#v} <= verbosity )); then
+  if [ ${#v} -le $verbosity ]; then
     "$@"
   else
     "$@" > /dev/null
@@ -155,7 +155,7 @@ prefix=/usr/local
 # process arguments {{{
 case "$1" in
 -c)
-  if (( $# == 2 )) && [ -f "$2" ]; then
+  if [ $# -eq 2 ] && [ -f "$2" ]; then
     want_configure=1
     shift
   else
@@ -167,20 +167,20 @@ case "$1" in
 --help) want_man=1 ;;
 esac
 
-if (( 0 == want_usage && 0 == want_man )); then
-  script="$1"; shift
+if [ 0 -eq $want_usage ] && [ 0 -eq $want_man ]; then
+  script="${1:-}"; shift
 
-  test -e "$script" || {
+  [ -e "$script" ] || {
     errormsg "%s: file not found\n" "$script"
     exit 1
   }
 
-  if (( want_configure )); then
+  if [ $want_configure -ne 0 ]; then
     create_configure "$script"
     exit
   fi
 
-  while (( $# )); do # {{{
+  while [ $# -gt 0 ]; do # {{{
     case "$1" in
     -h)
       want_usage=1
@@ -189,7 +189,7 @@ if (( 0 == want_usage && 0 == want_man )); then
       want_help=1
       ;;
     -v|--verbose)
-      (( verbosity += 1 ))
+      verbosity=$(( verbosity + 1 ))
       ;;
     --prefix=*)
       prefix="${1#--prefix=}"
@@ -214,13 +214,13 @@ if (( 0 == want_usage && 0 == want_man )); then
 fi
 # }}}
 
-if (( want_usage )); then # {{{
+if [ $want_usage -ne 0 ]; then # {{{
   errormsg "usage: %s [-h|--help]\n" "$_SELF"
   errormsg "usage: %s -c INPUT\n" "$_SELF"
   errormsg "usage: %s INPUT [--prefix=PFX] [NAME=VALUE...]\n" "$_SELF"
   exit $exit_code
 fi # }}}
-if (( want_man )); then # {{{
+if [ $want_man -ne 0 ]; then # {{{
   man "$_SELF"
   exit
 fi # }}}
