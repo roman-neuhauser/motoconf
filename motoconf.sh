@@ -153,19 +153,24 @@ verbosity=0
 prefix=/usr/local
 
 # process arguments {{{
-case "$1" in
--c)
-  if [ $# -eq 2 ] && [ -f "$2" ]; then
-    want_configure=1
-    shift
-  else
-    errormsg "the '-c' option requires an INPUT script\n"
-    want_usage=1
-  fi
-;;
--h) want_usage=1 ;;
---help) want_man=1 ;;
-esac
+if [ "x${1+set}" = xset ]; then
+  case "$1" in
+  -c)
+    if [ $# -eq 2 ] && [ -f "$2" ]; then
+      want_configure=1
+      shift
+    else
+      errormsg "the '-c' option requires an INPUT script\n"
+      want_usage=1
+    fi
+  ;;
+  -h) want_usage=1 ;;
+  --help) want_man=1 ;;
+  esac
+else
+  want_usage=1
+  exit_code=1
+fi
 
 if [ 0 -eq $want_usage ] && [ 0 -eq $want_man ]; then
   script="${1:-}"; shift

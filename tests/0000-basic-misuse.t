@@ -14,7 +14,9 @@ test
 ::
 
   $ motoconf
-  *: unbound variable (glob)
+  motoconf: usage: motoconf [-h|--help]
+  motoconf: usage: motoconf -c INPUT
+  motoconf: usage: motoconf INPUT [--prefix=PFX] [NAME=VALUE...]
   [1]
 
   $ motoconf fubar
