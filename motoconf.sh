@@ -159,7 +159,7 @@ case "$1" in
     want_configure=1
     shift
   else
-    errormsg "the '-c' option requires an INPUT script\n" "$_SELF"
+    errormsg "the '-c' option requires an INPUT script\n"
     want_usage=1
   fi
 ;;
