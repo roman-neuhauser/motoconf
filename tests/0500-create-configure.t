@@ -24,7 +24,7 @@ test
   [1]
   $ motoconf -c
   motoconf: the '-c' option requires an INPUT script
-  motoconf: usage: motoconf [-h|--help]
+  motoconf: usage: motoconf -h | --help
   motoconf: usage: motoconf -c INPUT
   motoconf: usage: motoconf INPUT [--prefix=PFX] [NAME=VALUE...]
   $ test -e configure

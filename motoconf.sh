@@ -220,7 +220,7 @@ fi
 # }}}
 
 if [ $want_usage -ne 0 ]; then # {{{
-  errormsg "usage: %s [-h|--help]\n" "$_SELF"
+  errormsg "usage: %s -h | --help\n" "$_SELF"
   errormsg "usage: %s -c INPUT\n" "$_SELF"
   errormsg "usage: %s INPUT [--prefix=PFX] [NAME=VALUE...]\n" "$_SELF"
   exit $exit_code
