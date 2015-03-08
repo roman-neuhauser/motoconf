@@ -110,7 +110,7 @@
          string LDFLAGS "" \\
          string LIBS "" \\
          program CRAMCMD "$(first_in_path cram cram3 cram2)" \\
-         program RST2HTMLCMD "$(first_in_path rst2html rst2html.py)"
+         program RST2HTMLCMD "$(first_in_path rst2html rst2html.py)" \\
          string RST2HTML --strict
 
        create_script mk-obj <<-'EOF'
