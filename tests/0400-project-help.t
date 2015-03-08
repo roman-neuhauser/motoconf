@@ -14,8 +14,8 @@ test
 ::
 
   $ cat >moto.conf <<'EOF'
-  > register_values program TEST true string OPTS "--omg --wtf"
-  > populate file
+  > mtc_register_values program TEST true string OPTS "--omg --wtf"
+  > mtc_populate file
   > EOF
   $ cat >file.in <<'EOF'
   > PATH=@PATH@

@@ -14,7 +14,7 @@ test
 ::
 
   $ cat >moto.conf <<'EOF'
-  > populate file
+  > mtc_populate file
   > EOF
   $ cat >file.in <<'EOF'
   > PATH=@PATH@

@@ -32,8 +32,8 @@
      on the command line.  This interface deliberately mimics *autoconf(1)*
      -generated configure scripts.  The input script deliberately deviates
      from *autoconf(1)* being a POSIX *sh(1)* script using `motoconf`-provided
-     functions.  It should open with a call to `register_values`, and close
-     with `populate Makefile` or equivalent.
+     functions.  It should open with a call to `mtc_register_values`, and close
+     with `mtc_populate Makefile` or equivalent.
 
    `Motoconf Options`
      `-c INPUT`
@@ -54,9 +54,9 @@
    `Placeholders`
      Placeholders are @-delimited words (shell parameter names) occurring in
      output file templates.  Placeholder names are registered in the input
-     script with `register_values`.  Input script containing
+     script with `mtc_register_values`.  Input script containing
 
-       register_values string NAME VALUE
+       mtc_register_values string NAME VALUE
 
      instructs `motoconf` to replace, when copying output file templates into
      their destinations, all occurrences of `@NAME@` with `VALUE`.  Builtin
@@ -67,7 +67,7 @@
        $(dirname "$1")
 
    `Functions`
-     `register_values` KIND NAME VALUE [KIND NAME VALUE]...
+     `mtc_register_values` KIND NAME VALUE [KIND NAME VALUE]...
          Takes a list of triplets, each specifying rules for handling the
          value, the placeholder to replace in templates, and the value replac‐
          ing it.
@@ -84,15 +84,15 @@
          `VALUE`
            Any string.
 
-     `first_in_path` FILE...
+     `mtc_first_in_path` FILE...
          Takes a list of filenames, and returns the first that could be found
          in $PATH.
 
-     `create_script` FILE
+     `mtc_create_script` FILE
          Takes a pathname and clobbers it with the contents of the standard
          input.  Performs placeholder substitutions.
 
-     `populate` FILE
+     `mtc_populate` FILE
          Takes a pathname and clobbers it with the contents of FILE.in.  Per‐
          forms placeholder substitutions.
 
@@ -102,44 +102,44 @@
   `EXAMPLES`
      The entire input script (moto.conf):
 
-       register_values \\
-         program CC "$(first_in_path gcc clang)" \\
+       mtc_register_values \\
+         program CC "$(mtc_first_in_path gcc clang)" \\
          string CFLAGS "-std=c99 -fPIC -Wall -Wextra -Wfatal-errors" \\
          string CPPFLAGS "-D_POSIX_C_SOURCE=200809L" \\
          program LD "\$CC" \\
          string LDFLAGS "" \\
          string LIBS "" \\
-         program CRAMCMD "$(first_in_path cram cram3 cram2)" \\
-         program RST2HTMLCMD "$(first_in_path rst2html rst2html.py)" \\
+         program CRAMCMD "$(mtc_first_in_path cram cram3 cram2)" \\
+         program RST2HTMLCMD "$(mtc_first_in_path rst2html rst2html.py)" \\
          string RST2HTML --strict
 
-       create_script mk-obj <<-'EOF'
+       mtc_create_script mk-obj <<-'EOF'
                #!/bin/sh
                target="$1"; shift
                exec @CC@ @CPPFLAGS@ @CFLAGS@ -c -o"$target" "$@"
        EOF
-       create_script mk-exe <<-'EOF'
+       mtc_create_script mk-exe <<-'EOF'
                #!/bin/sh
                target="$1"; shift
                exec @LD@ @LDFLAGS@ -L"$PWD" -o"$target" "$@" @LIBS@
        EOF
-       create_script mk-so <<-'EOF'
+       mtc_create_script mk-so <<-'EOF'
                #!/bin/sh
                target="$1"; shift
                exec @LD@ --shared -Wl,--soname="$target" @LDFLAGS@ -o"$target" "$@" @LIBS@
        EOF
-       create_script mk-html <<-'EOF'
+       mtc_create_script mk-html <<-'EOF'
                #!/bin/sh
                exec @RST2HTMLCMD@ @RST2HTML@ "$@"
        EOF
-       create_script mk-runtests <<-'EOF'
+       mtc_create_script mk-runtests <<-'EOF'
                #!/bin/sh
                exec env -i CRAM="$CRAM" PATH="@PATH@:@srcdir@/tests:$PWD" @CRAMCMD@ @srcdir@/tests
        EOF
 
-       populate GNUmakefile
+       mtc_populate GNUmakefile
 
-     GNUmakefile.in, used by the `populate` call at the end of moto.conf would
+     GNUmakefile.in, used by the `mtc_populate` call at the end of moto.conf would
      include the following rules:
 
        VPATH = @srcdir@

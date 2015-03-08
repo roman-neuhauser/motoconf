@@ -5,10 +5,10 @@ set -eu
 
 _SELF=${0##*/}
 
-register_values() # {{{
+mtc_register_values() # {{{
 {
   while [ $# -gt 2 ]; do
-    register_$1 "$2" "$3"
+    mtc_register_$1 "$2" "$3"
     shift 3
   done
 
@@ -22,7 +22,7 @@ register_values() # {{{
 
   local prog
   for prog in $programs; do
-    check_program $prog
+    mtc_check_program $prog
   done
 
   if [ $want_help -ne 0 ]; then # {{{
@@ -30,20 +30,20 @@ register_values() # {{{
   fi # }}}
 } # }}}
 
-register_string() # {{{
+mtc_register_string() # {{{
 {
   local var="${1?}" default="${2?}"
   eval ": \${$var=\"$default\"}"
   variables="$variables $var"
 } # }}}
-register_program() # {{{
+mtc_register_program() # {{{
 {
   local var="${1?}" default="${2?}"
-  register_string "$var" "$default"
+  mtc_register_string "$var" "$default"
   programs="$programs $var"
 } # }}}
 
-first_in_path() # {{{
+mtc_first_in_path() # {{{
 {
   local pth
   local dir prog
@@ -64,11 +64,11 @@ first_in_path() # {{{
   done
   return 1
 } # }}}
-check_program() # {{{
+mtc_check_program() # {{{
 {
-  chatty -v do_check_program "$@"
+  _mtc_chatty -v _mtc_do_check_program "$@"
 } # }}}
-do_check_program() # {{{
+_mtc_do_check_program() # {{{
 {
   local var="$1"
   eval "local prog=\"\$$var\""
@@ -79,34 +79,34 @@ do_check_program() # {{{
       printf "%s\n" "$prog"
     else
       printf "FAIL\n"
-      errormsg "%s: not runnable\n" "$prog"
+      _mtc_errormsg "%s: not runnable\n" "$prog"
       exit 1
     fi
     ;;
   *)
-    if first_in_path "$prog"; then
+    if mtc_first_in_path "$prog"; then
       printf "\n"
     else
       printf "FAIL\n"
-      errormsg "%s: file not found\n" "$prog"
+      _mtc_errormsg "%s: file not found\n" "$prog"
       exit 1
     fi
     ;;
   esac
 } # }}}
-create_script() # {{{
+mtc_create_script() # {{{
 {
   local file=${1:?}
-  chatty -vv printf "generating %s\n" "$1"
+  _mtc_chatty -vv printf "generating %s\n" "$1"
   cat > $file.in
-  chatty -vvv populate $file
+  _mtc_chatty -vvv mtc_populate $file
   chmod +x $file
   rm $file.in
 } # }}}
-populate() # {{{
+mtc_populate() # {{{
 {
   local file="${1?}" val="" seds=""
-  chatty -v printf "populating %s\n" "$file"
+  _mtc_chatty -v printf "populating %s\n" "$file"
   local input="$srcdir/$file.in"
   if [ -e "$file.in" ]; then
     input="$file.in"
@@ -117,7 +117,7 @@ populate() # {{{
   done
   sed "$seds" < "$input" > "$file"
 } # }}}
-chatty() # {{{
+_mtc_chatty() # {{{
 {
   local v=${1#-}
   shift
@@ -127,13 +127,13 @@ chatty() # {{{
     "$@" > /dev/null
   fi
 } # }}}
-errormsg() # {{{
+_mtc_errormsg() # {{{
 {
   printf >&2 "%s: " "$_SELF"
   printf >&2 "$@"
 } # }}}
 
-create_configure() # {{{
+_mtc_mtc_create_configure() # {{{
 {
   cat >configure <<-EOF
 	#!/bin/sh
@@ -160,7 +160,7 @@ if [ "x${1+set}" = xset ]; then
       want_configure=1
       shift
     else
-      errormsg "the '-c' option requires an INPUT script\n"
+      _mtc_errormsg "the '-c' option requires an INPUT script\n"
       want_usage=1
     fi
   ;;
@@ -176,12 +176,12 @@ if [ 0 -eq $want_usage ] && [ 0 -eq $want_man ]; then
   script="${1:-}"; shift
 
   [ -e "$script" ] || {
-    errormsg "%s: file not found\n" "$script"
+    _mtc_errormsg "%s: file not found\n" "$script"
     exit 1
   }
 
   if [ $want_configure -ne 0 ]; then
-    create_configure "$script"
+    _mtc_mtc_create_configure "$script"
     exit
   fi
 
@@ -204,7 +204,7 @@ if [ 0 -eq $want_usage ] && [ 0 -eq $want_man ]; then
       prefix="${1:?}"
       ;;
     -*)
-      errormsg "unknown option: %s\n" "$1"
+      _mtc_errormsg "unknown option: %s\n" "$1"
       want_usage=1
       exit_code=1
       break
@@ -220,9 +220,9 @@ fi
 # }}}
 
 if [ $want_usage -ne 0 ]; then # {{{
-  errormsg "usage: %s -h | --help\n" "$_SELF"
-  errormsg "usage: %s -c INPUT\n" "$_SELF"
-  errormsg "usage: %s INPUT [--prefix=PFX] [NAME=VALUE...]\n" "$_SELF"
+  _mtc_errormsg "usage: %s -h | --help\n" "$_SELF"
+  _mtc_errormsg "usage: %s -c INPUT\n" "$_SELF"
+  _mtc_errormsg "usage: %s INPUT [--prefix=PFX] [NAME=VALUE...]\n" "$_SELF"
   exit $exit_code
 fi # }}}
 if [ $want_man -ne 0 ]; then # {{{

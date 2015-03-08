@@ -50,9 +50,9 @@ script using
 .Nm Ns -provided
 functions.
 It should open with a call to
-.Ic register_values ,
+.Ic mtc_register_values ,
 and close with
-.Dq Ic populate Pa Makefile
+.Dq Ic mtc_populate Pa Makefile
 or equivalent.
 .
 .Ss Motoconf Options
@@ -83,10 +83,10 @@ Placeholders are
 .Li @ Ns -delimited
 words (shell parameter names) occurring in output file templates.
 Placeholder names are registered in the input script with
-.Ic register_values .
+.Ic mtc_register_values .
 Input script containing
 .Bd -literal -offset "xx"
-register_values string NAME VALUE
+mtc_register_values string NAME VALUE
 
 .Ed
 instructs
@@ -117,7 +117,7 @@ $(dirname "$1")
 .
 .Ss Functions
 .Bl -tag -width "xx"
-. It Ic register_values Ar KIND Ar NAME Ar VALUE Oo Ar KIND Ar NAME Ar VALUE Oc Ns ...
+. It Ic mtc_register_values Ar KIND Ar NAME Ar VALUE Oo Ar KIND Ar NAME Ar VALUE Oc Ns ...
 Takes a list of triplets, each specifying rules for handling the value,
 the placeholder to replace in templates,
 and the value replacing it.
@@ -149,13 +149,13 @@ Placeholder name.
 .  It Ar VALUE
 Any string.
 . El
-. It Ic first_in_path Ar FILE Ns ...
+. It Ic mtc_first_in_path Ar FILE Ns ...
 Takes a list of filenames, and returns the first that could be found in
 .  Ev $PATH .
-.It Ic create_script Ar FILE
+.It Ic mtc_create_script Ar FILE
 Takes a pathname and clobbers it with the contents of the standard input.
 Performs placeholder substitutions.
-.It Ic populate Ar FILE
+.It Ic mtc_populate Ar FILE
 Takes a pathname and clobbers it with the contents of
 . Ar FILE Ns .in .
 Performs placeholder substitutions.
@@ -173,48 +173,48 @@ The entire input script
 .Pq Pa moto.conf :
 .
 .Bd -literal -offset "xx"
-register_values \\
-  program CC "$(first_in_path gcc clang)" \\
+mtc_register_values \\
+  program CC "$(mtc_first_in_path gcc clang)" \\
   string CFLAGS "-std=c99 -fPIC -Wall -Wextra -Wfatal-errors" \\
   string CPPFLAGS "-D_POSIX_C_SOURCE=200809L" \\
   program LD "\\$CC" \\
   string LDFLAGS "" \\
   string LIBS "" \\
-  program CRAMCMD "$(first_in_path cram cram3 cram2)" \\
-  program RST2HTMLCMD "$(first_in_path rst2html rst2html.py)" \\
+  program CRAMCMD "$(mtc_first_in_path cram cram3 cram2)" \\
+  program RST2HTMLCMD "$(mtc_first_in_path rst2html rst2html.py)" \\
   string RST2HTML --strict
 
-create_script mk-obj <<-'EOF'
+mtc_create_script mk-obj <<-'EOF'
 	#!/bin/sh
 	target="$1"; shift
 	exec @CC@ @CPPFLAGS@ @CFLAGS@ -c -o"$target" "$@"
 EOF
-create_script mk-exe <<-'EOF'
+mtc_create_script mk-exe <<-'EOF'
 	#!/bin/sh
 	target="$1"; shift
 	exec @LD@ @LDFLAGS@ -L"$PWD" -o"$target" "$@" @LIBS@
 EOF
-create_script mk-so <<-'EOF'
+mtc_create_script mk-so <<-'EOF'
 	#!/bin/sh
 	target="$1"; shift
 	exec @LD@ --shared -Wl,--soname="$target" @LDFLAGS@ -o"$target" "$@" @LIBS@
 EOF
-create_script mk-html <<-'EOF'
+mtc_create_script mk-html <<-'EOF'
 	#!/bin/sh
 	exec @RST2HTMLCMD@ @RST2HTML@ "$@"
 EOF
-create_script mk-runtests <<-'EOF'
+mtc_create_script mk-runtests <<-'EOF'
 	#!/bin/sh
 	exec env -i CRAM="$CRAM" PATH="@PATH@:@srcdir@/tests:$PWD" @CRAMCMD@ @srcdir@/tests
 EOF
 
-populate GNUmakefile
+mtc_populate GNUmakefile
 
 .Ed
 .
 .Pa GNUmakefile.in ,
 used by the
-.Ic populate
+.Ic mtc_populate
 call at the end of
 .Pa moto.conf
 would include the following rules:

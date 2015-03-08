@@ -14,10 +14,10 @@ test
 ::
 
   $ cat >moto.conf <<'EOF'
-  > register_values \
+  > mtc_register_values \
   >   program  TEST  true \
   >   string   OPTS  "--rofl --lmao"
-  > populate file
+  > mtc_populate file
   > EOF
 
   $ test -e configure
