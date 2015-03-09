@@ -133,7 +133,7 @@ _mtc_errormsg() # {{{
   printf >&2 "$@"
 } # }}}
 
-_mtc_mtc_create_configure() # {{{
+_mtc_create_configure() # {{{
 {
   cat >configure <<-EOF
 	#!/bin/sh
@@ -181,7 +181,7 @@ if [ 0 -eq $want_usage ] && [ 0 -eq $want_man ]; then
   }
 
   if [ $want_configure -ne 0 ]; then
-    _mtc_mtc_create_configure "$script"
+    _mtc_create_configure "$script"
     exit
   fi
 
