@@ -132,7 +132,11 @@ _mtc_errormsg() # {{{
   printf >&2 "%s: " "$_SELF"
   printf >&2 "$@"
 } # }}}
-
+_mtc_help() # {{{
+{
+  man "$_SELF"
+  exit
+} # }}}
 _mtc_usage() # {{{
 {
   _mtc_errormsg "usage: %s -h | --help\n" "$_SELF"
@@ -153,7 +157,6 @@ EOF
 } # }}}
 
 want_help=0
-want_man=0
 want_configure=0
 verbosity=0
 prefix=/usr/local
@@ -172,12 +175,16 @@ else
       shift
     fi
   ;;
-  -h) _mtc_usage 0 ;;
-  --help) want_man=1 ;;
+  -h)
+    _mtc_usage 0
+  ;;
+  --help)
+    _mtc_help
+  ;;
   esac
 fi
 
-if [ 0 -eq $want_man ]; then
+if [ $# -gt 0 ]; then
   script="${1:-}"; shift
 
   [ -e "$script" ] || {
@@ -221,11 +228,6 @@ if [ 0 -eq $want_man ]; then
   done # }}}
 fi
 # }}}
-
-if [ $want_man -ne 0 ]; then # {{{
-  man "$_SELF"
-  exit
-fi # }}}
 
 srcdir="$(dirname $script)"
 
