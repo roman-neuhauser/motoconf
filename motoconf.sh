@@ -133,6 +133,14 @@ _mtc_errormsg() # {{{
   printf >&2 "$@"
 } # }}}
 
+_mtc_usage() # {{{
+{
+  _mtc_errormsg "usage: %s -h | --help\n" "$_SELF"
+  _mtc_errormsg "usage: %s -c INPUT\n" "$_SELF"
+  _mtc_errormsg "usage: %s INPUT [--prefix=PFX] [NAME=VALUE...]\n" "$_SELF"
+  exit ${1:-111}
+} # }}}
+
 _mtc_create_configure() # {{{
 {
   cat >configure <<-EOF
@@ -144,36 +152,32 @@ EOF
   chmod +x configure
 } # }}}
 
-exit_code=0
 want_help=0
 want_man=0
-want_usage=0
 want_configure=0
 verbosity=0
 prefix=/usr/local
 
 # process arguments {{{
-if [ "x${1+set}" = xset ]; then
+if [ "x${1+set}" != xset ]; then
+  _mtc_usage 1
+else
   case "$1" in
   -c)
-    if [ $# -eq 2 ] && [ -f "$2" ]; then
+    if [ $# -ne 2 ] || ! [ -f "$2" ]; then
+      _mtc_errormsg "the '-c' option requires an INPUT script\n"
+      _mtc_usage 1
+    else
       want_configure=1
       shift
-    else
-      _mtc_errormsg "the '-c' option requires an INPUT script\n"
-      want_usage=1
-      exit_code=1
     fi
   ;;
-  -h) want_usage=1 ;;
+  -h) _mtc_usage 0 ;;
   --help) want_man=1 ;;
   esac
-else
-  want_usage=1
-  exit_code=1
 fi
 
-if [ 0 -eq $want_usage ] && [ 0 -eq $want_man ]; then
+if [ 0 -eq $want_man ]; then
   script="${1:-}"; shift
 
   [ -e "$script" ] || {
@@ -189,7 +193,7 @@ if [ 0 -eq $want_usage ] && [ 0 -eq $want_man ]; then
   while [ $# -gt 0 ]; do # {{{
     case "$1" in
     -h)
-      want_usage=1
+      _mtc_usage 0
       ;;
     -h|--help)
       want_help=1
@@ -206,9 +210,7 @@ if [ 0 -eq $want_usage ] && [ 0 -eq $want_man ]; then
       ;;
     -*)
       _mtc_errormsg "unknown option: %s\n" "$1"
-      want_usage=1
-      exit_code=1
-      break
+      _mtc_usage 1
       ;;
     *=*)
       var="${1%%=*}" val="${1#*=}"
@@ -220,12 +222,6 @@ if [ 0 -eq $want_usage ] && [ 0 -eq $want_man ]; then
 fi
 # }}}
 
-if [ $want_usage -ne 0 ]; then # {{{
-  _mtc_errormsg "usage: %s -h | --help\n" "$_SELF"
-  _mtc_errormsg "usage: %s -c INPUT\n" "$_SELF"
-  _mtc_errormsg "usage: %s INPUT [--prefix=PFX] [NAME=VALUE...]\n" "$_SELF"
-  exit $exit_code
-fi # }}}
 if [ $want_man -ne 0 ]; then # {{{
   man "$_SELF"
   exit
