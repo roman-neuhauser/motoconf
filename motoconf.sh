@@ -206,8 +206,8 @@ if [ $# -eq 0 ]; then
   _mtc_usage 1
 fi
 
-script="$1"; shift
-_mtc_assert_file "$script"
+mtc_input="$1"; shift
+_mtc_assert_file "$mtc_input"
 
 while [ $# -gt 0 ]; do # project-specific stuff {{{
   case "$1" in
@@ -240,16 +240,16 @@ while [ $# -gt 0 ]; do # project-specific stuff {{{
 done # }}}
 # }}}
 
-srcdir="$(dirname "$script")"
+srcdir="$(dirname "$mtc_input")"
 
 _mtc_variables="PATH prefix srcdir"
 _mtc_programs=""
 
 # ================================================
 
-case "$script" in
+case "$mtc_input" in
 */*) ;;
-*) script="./$script" ;;
+*) mtc_input="./$mtc_input" ;;
 esac
 
-. "$script"
+. "$mtc_input"
