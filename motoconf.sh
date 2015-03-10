@@ -14,9 +14,10 @@ mtc_register_values() # {{{
 
   if [ $_mtc_project_help_wanted -ne 0 ]; then # {{{
     printf "Supported variables and their current values:\n"
-    local val
+    local val var
     for var in $_mtc_variables; do
-      eval "printf '  %-10s  =  %s\n' $var \"\$$var\""
+      eval "val=\"\$$var\""
+      printf '  %-10s  =  %s\n' "$var" "$val"
     done
   fi # }}}
 
@@ -69,8 +70,8 @@ mtc_check_program() # {{{
 } # }}}
 _mtc_do_check_program() # {{{
 {
-  local var="$1"
-  eval "local prog=\"\$$var\""
+  local prog var="$1"
+  eval "prog=\"\$$var\""
   printf "checking %-16s" "$var ..."
   case "$prog" in
   /*)
@@ -104,12 +105,13 @@ mtc_create_script() # {{{
 } # }}}
 mtc_populate() # {{{
 {
-  local file="$1" val="" seds=""
+  local file="$1" seds=""
   _mtc_chatty -v printf "populating %s\n" "$file"
   local input="$srcdir/$file.in"
   if [ -e "$file.in" ]; then
     input="$file.in"
   fi
+  local val var
   for var in $_mtc_variables; do
     eval "val=\"\$$var\""
     seds="$seds s@$var@$valg;"
