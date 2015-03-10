@@ -32,21 +32,20 @@ mtc_register_values() # {{{
 
 mtc_register_string() # {{{
 {
-  local var="${1?}" default="${2?}"
-  eval ": \${$var=\"$default\"}"
+  local var="$1" default="$2"
+  eval ": \${$var=\"\$default\"}"
   _mtc_variables="$_mtc_variables $var"
 } # }}}
 mtc_register_program() # {{{
 {
-  local var="${1?}" default="${2?}"
+  local var="$1" default="$2"
   mtc_register_string "$var" "$default"
   _mtc_programs="$_mtc_programs $var"
 } # }}}
 
 mtc_first_in_path() # {{{
 {
-  local pth
-  local dir prog
+  local dex dir prog pth
   for prog do
     pth="$PATH"
     while :; do
@@ -96,16 +95,16 @@ _mtc_do_check_program() # {{{
 } # }}}
 mtc_create_script() # {{{
 {
-  local file=${1:?}
-  _mtc_chatty -vv printf "generating %s\n" "$1"
-  cat > $file.in
-  _mtc_chatty -vvv mtc_populate $file
-  chmod +x $file
-  rm $file.in
+  local file="$1"
+  _mtc_chatty -vv printf "generating %s\n" "$file"
+  cat > "$file.in"
+  _mtc_chatty -vvv mtc_populate "$file"
+  chmod +x "$file"
+  rm "$file.in"
 } # }}}
 mtc_populate() # {{{
 {
-  local file="${1?}" val="" seds=""
+  local file="$1" val="" seds=""
   _mtc_chatty -v printf "populating %s\n" "$file"
   local input="$srcdir/$file.in"
   if [ -e "$file.in" ]; then
@@ -226,7 +225,7 @@ while [ $# -gt 0 ]; do # project-specific stuff {{{
     ;;
   --prefix)
     shift
-    prefix="${1:?}"
+    prefix="$1"
     ;;
   -*)
     _mtc_errormsg "unknown option: %s\n" "$1"
@@ -241,14 +240,14 @@ while [ $# -gt 0 ]; do # project-specific stuff {{{
 done # }}}
 # }}}
 
-srcdir="$(dirname $script)"
+srcdir="$(dirname "$script")"
 
 _mtc_variables="PATH prefix srcdir"
 _mtc_programs=""
 
 # ================================================
 
-case $script in
+case "$script" in
 */*) ;;
 *) script="./$script" ;;
 esac
