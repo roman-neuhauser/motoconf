@@ -168,13 +168,15 @@ verbosity=0
 prefix=/usr/local
 
 # process arguments {{{
-if [ "x${1+set}" != xset ]; then
+if [ $# -eq 0 ]; then
   _mtc_usage 1
-else
+fi
+
+while [ $# -gt 0 ]; do # motoconf options {{{
   case "$1" in
   -c)
     shift
-    if [ $# -ne 1 ]; then
+    if [ $# -lt 1 ]; then
       _mtc_errormsg "the '-c' option requires an INPUT script\n"
       _mtc_usage 1
     else
@@ -189,43 +191,54 @@ else
   --help)
     _mtc_help
   ;;
+  -*)
+    _mtc_errormsg "unknown option: %s\n" "$1"
+    _mtc_usage 1
+  ;;
+  *)
+    # not an option, should be the INPUT script
+    break
+  ;;
   esac
+  shift
+done # }}}
+
+if [ $# -eq 0 ]; then
+  _mtc_usage 1
 fi
 
-if [ $# -gt 0 ]; then
-  script="${1:-}"; shift
-  _mtc_assert_file "$script"
+script="$1"; shift
+_mtc_assert_file "$script"
 
-  while [ $# -gt 0 ]; do # {{{
-    case "$1" in
-    -h)
-      _mtc_usage 0
-      ;;
-    -h|--help)
-      want_help=1
-      ;;
-    -v|--verbose)
-      verbosity=$(( verbosity + 1 ))
-      ;;
-    --prefix=*)
-      prefix="${1#--prefix=}"
-      ;;
-    --prefix)
-      shift
-      prefix="${1:?}"
-      ;;
-    -*)
-      _mtc_errormsg "unknown option: %s\n" "$1"
-      _mtc_usage 1
-      ;;
-    *=*)
-      var="${1%%=*}" val="${1#*=}"
-      eval "$var=\"\$val\""
-      ;;
-    esac
+while [ $# -gt 0 ]; do # project-specific stuff {{{
+  case "$1" in
+  -h)
+    _mtc_usage 0
+    ;;
+  -h|--help)
+    want_help=1
+    ;;
+  -v|--verbose)
+    verbosity=$(( verbosity + 1 ))
+    ;;
+  --prefix=*)
+    prefix="${1#--prefix=}"
+    ;;
+  --prefix)
     shift
-  done # }}}
-fi
+    prefix="${1:?}"
+    ;;
+  -*)
+    _mtc_errormsg "unknown option: %s\n" "$1"
+    _mtc_usage 1
+    ;;
+  *=*)
+    var="${1%%=*}" val="${1#*=}"
+    eval "$var=\"\$val\""
+    ;;
+  esac
+  shift
+done # }}}
 # }}}
 
 srcdir="$(dirname $script)"

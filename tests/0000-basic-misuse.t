@@ -24,6 +24,9 @@ test
   [1]
 
   $ motoconf --fubar
-  motoconf: --fubar: file not found
+  motoconf: unknown option: --fubar
+  motoconf: usage: motoconf -h | --help
+  motoconf: usage: motoconf -c INPUT
+  motoconf: usage: motoconf INPUT [--prefix=PFX] [NAME=VALUE...]
   [1]
 
