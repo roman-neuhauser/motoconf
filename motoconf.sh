@@ -12,20 +12,20 @@ mtc_register_values() # {{{
     shift 3
   done
 
-  if [ $want_help -ne 0 ]; then # {{{
+  if [ $_mtc_project_help_wanted -ne 0 ]; then # {{{
     printf "Supported variables and their current values:\n"
     local val
-    for var in $variables; do
+    for var in $_mtc_variables; do
       eval "printf '  %-10s  =  %s\n' $var \"\$$var\""
     done
   fi # }}}
 
   local prog
-  for prog in $programs; do
+  for prog in $_mtc_programs; do
     mtc_check_program $prog
   done
 
-  if [ $want_help -ne 0 ]; then # {{{
+  if [ $_mtc_project_help_wanted -ne 0 ]; then # {{{
     exit
   fi # }}}
 } # }}}
@@ -34,13 +34,13 @@ mtc_register_string() # {{{
 {
   local var="${1?}" default="${2?}"
   eval ": \${$var=\"$default\"}"
-  variables="$variables $var"
+  _mtc_variables="$_mtc_variables $var"
 } # }}}
 mtc_register_program() # {{{
 {
   local var="${1?}" default="${2?}"
   mtc_register_string "$var" "$default"
-  programs="$programs $var"
+  _mtc_programs="$_mtc_programs $var"
 } # }}}
 
 mtc_first_in_path() # {{{
@@ -111,7 +111,7 @@ mtc_populate() # {{{
   if [ -e "$file.in" ]; then
     input="$file.in"
   fi
-  for var in $variables; do
+  for var in $_mtc_variables; do
     eval "val=\"\$$var\""
     seds="$seds s@$var@$valg;"
   done
@@ -121,7 +121,7 @@ _mtc_chatty() # {{{
 {
   local v=${1#-}
   shift
-  if [ ${#v} -le $verbosity ]; then
+  if [ ${#v} -le $_mtc_verbosity ]; then
     "$@"
   else
     "$@" > /dev/null
@@ -163,8 +163,8 @@ EOF
   chmod +x configure
 } # }}}
 
-want_help=0
-verbosity=0
+_mtc_project_help_wanted=0
+_mtc_verbosity=0
 prefix=/usr/local
 
 # process arguments {{{
@@ -216,10 +216,10 @@ while [ $# -gt 0 ]; do # project-specific stuff {{{
     _mtc_usage 0
     ;;
   -h|--help)
-    want_help=1
+    _mtc_project_help_wanted=1
     ;;
   -v|--verbose)
-    verbosity=$(( verbosity + 1 ))
+    _mtc_verbosity=$(( _mtc_verbosity + 1 ))
     ;;
   --prefix=*)
     prefix="${1#--prefix=}"
@@ -243,8 +243,8 @@ done # }}}
 
 srcdir="$(dirname $script)"
 
-variables="PATH prefix srcdir"
-programs=""
+_mtc_variables="PATH prefix srcdir"
+_mtc_programs=""
 
 # ================================================
 
