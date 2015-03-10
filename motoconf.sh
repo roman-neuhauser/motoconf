@@ -137,6 +137,13 @@ _mtc_help() # {{{
   man "$_SELF"
   exit
 } # }}}
+_mtc_assert_file() # {{{
+{
+  [ -f "$1" ] || {
+    _mtc_errormsg "%s: file not found\n" "$1"
+    exit 1
+  }
+} # }}}
 _mtc_usage() # {{{
 {
   _mtc_errormsg "usage: %s -h | --help\n" "$_SELF"
@@ -157,7 +164,6 @@ EOF
 } # }}}
 
 want_help=0
-want_configure=0
 verbosity=0
 prefix=/usr/local
 
@@ -167,12 +173,14 @@ if [ "x${1+set}" != xset ]; then
 else
   case "$1" in
   -c)
-    if [ $# -ne 2 ] || ! [ -f "$2" ]; then
+    shift
+    if [ $# -ne 1 ]; then
       _mtc_errormsg "the '-c' option requires an INPUT script\n"
       _mtc_usage 1
     else
-      want_configure=1
-      shift
+      _mtc_assert_file "$1"
+      _mtc_create_configure "$1"
+      exit
     fi
   ;;
   -h)
@@ -186,16 +194,7 @@ fi
 
 if [ $# -gt 0 ]; then
   script="${1:-}"; shift
-
-  [ -e "$script" ] || {
-    _mtc_errormsg "%s: file not found\n" "$script"
-    exit 1
-  }
-
-  if [ $want_configure -ne 0 ]; then
-    _mtc_create_configure "$script"
-    exit
-  fi
+  _mtc_assert_file "$script"
 
   while [ $# -gt 0 ]; do # {{{
     case "$1" in
