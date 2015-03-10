@@ -162,6 +162,7 @@ if [ "x${1+set}" = xset ]; then
     else
       _mtc_errormsg "the '-c' option requires an INPUT script\n"
       want_usage=1
+      exit_code=1
     fi
   ;;
   -h) want_usage=1 ;;
