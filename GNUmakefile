@@ -5,6 +5,8 @@ BINDIR         ?= $(PREFIX)/bin
 MANDIR         ?= $(PREFIX)/share/man
 MAN1DIR        ?= $(MANDIR)/man1
 
+TARGET_SHELL    = /bin/sh
+
 CRAMCMD         = cram
 
 GZIPCMD        ?= gzip
@@ -62,7 +64,9 @@ tarball: .git
 	$(RST2HTML) --strict $< $@
 
 $(name): $(name).sh
-	$(INSTALL_SCRIPT) $< $@
+	sed -e '1s,@SHEBANG@,$(call shebang,$(TARGET_SHELL)),' $< | tee $@.tmp >/dev/null
+	$(INSTALL_SCRIPT) $@.tmp $@
+	$(RM) $@.tmp
 
 $(name).spec: $(name).spec.in
 	$(call subst_version,^Version:)
@@ -76,6 +80,13 @@ define subst_version
 endef
 
 fix_version = $(subst -,+,$(patsubst v%,%,$(revname)))
+
+define shebang
+$(strip $(if $(findstring /,$(1))
+, #!$(1)
+, #!/usr/bin/env $(1)
+))
+endef
 
 define first_in_path
 $(or \
