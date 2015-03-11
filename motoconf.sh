@@ -47,20 +47,30 @@ mtc_register_program() # {{{
 mtc_first_in_path() # {{{
 {
   local dex dir prog pth
-  for prog do
-    pth="$PATH"
-    while :; do
-      dir="${pth%%:*}"
-      pth="${pth#*:}"
-      dex="$dir/$prog"
-      if [ -f "$dex" -a -x "$dex" ]; then
-        printf "%s" "$dex"
-        return
-      fi
-      if [ "$dir" = "$pth" ]; then
-        break
-      fi
-    done
+  for prog; do
+    if _mtc_find_prog "$prog"; then
+      return
+    fi
+  done
+  for prog; do
+    _mtc_errormsg "%s: file not found\n" "$prog"
+  done
+  return 1
+} # }}}
+_mtc_find_prog() # {{{
+{
+  local dex dir prog="$1" pth="$PATH"
+  while :; do
+    dir="${pth%%:*}"
+    pth="${pth#*:}"
+    dex="$dir/$prog"
+    if [ -f "$dex" -a -x "$dex" ]; then
+      printf "%s" "$dex"
+      return
+    fi
+    if [ "$dir" = "$pth" ]; then
+      break
+    fi
   done
   return 1
 } # }}}
@@ -88,7 +98,16 @@ _mtc_do_check_program() # {{{
     fi
     ;;
   *)
-    if mtc_first_in_path "$prog"; then
+    # if the user-supplied value is the empty string, like in
+    # mtc_register_program FOO "$(mtc_first_in_path foo bar)"
+    # where neither foo nor bar is found, we'll have prog='',
+    # which would yield "motoconf: : file not found\n",
+    # not to mention the useless call to _mtc_find_prog.
+    if [ -z "$prog" ]; then
+      printf "FAIL\n"
+      exit 1
+    fi
+    if _mtc_find_prog "$prog"; then
       printf "\n"
     else
       printf "FAIL\n"
