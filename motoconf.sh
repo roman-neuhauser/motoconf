@@ -77,9 +77,13 @@ _mtc_do_check_program() # {{{
   /*)
     if [ -f "$prog" -a -x "$prog" ]; then
       printf "%s\n" "$prog"
-    else
+    elif [ -e "$prog" ]; then
       printf "FAIL\n"
       _mtc_errormsg "%s: not runnable\n" "$prog"
+      exit 1
+    else
+      printf "FAIL\n"
+      _mtc_errormsg "%s: file not found\n" "$prog"
       exit 1
     fi
     ;;
