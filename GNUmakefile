@@ -83,8 +83,8 @@ fix_version = $(subst -,+,$(patsubst v%,%,$(revname)))
 
 define shebang
 $(strip $(if $(findstring /,$(1))
-, #!$(1)
-, #!/usr/bin/env $(1)
+, $(1)
+, /usr/bin/env $(1)
 ))
 endef
 

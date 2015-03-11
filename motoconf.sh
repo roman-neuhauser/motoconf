@@ -1,4 +1,4 @@
-@SHEBANG@
+#!@SHEBANG@
 # vim: noet sts=2 sw=2 ts=8 fdm=marker cms=\ #\ %s
 
 set -eu
