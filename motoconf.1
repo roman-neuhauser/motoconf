@@ -50,7 +50,7 @@ script using
 .Nm Ns -provided
 functions.
 It should open with a call to
-.Ic mtc_register_values ,
+.Ic mtc_register ,
 and close with
 .Dq Ic mtc_populate Pa Makefile
 or equivalent.
@@ -83,10 +83,10 @@ Placeholders are
 .Li @ Ns -delimited
 words (shell parameter names) occurring in output file templates.
 Placeholder names are registered in the input script with
-.Ic mtc_register_values .
+.Ic mtc_register .
 Input script containing
 .Bd -literal -offset "xx"
-mtc_register_values string NAME VALUE
+mtc_register -- string NAME VALUE
 
 .Ed
 instructs
@@ -117,26 +117,30 @@ $(dirname "$1")
 .
 .Ss Functions
 .Bl -tag -width "xx"
-. It Ic mtc_register_values Ar KIND Ar NAME Ar VALUE Oo Ar KIND Ar NAME Ar VALUE Oc Ns ...
-Takes a list of triplets, each specifying rules for handling the value,
-the placeholder to replace in templates,
-and the value replacing it.
+. It Ic mtc_register \
+        Ar -- Ar KIND Ar NAME Ar VALUE Oo Ar VALUE Ns ... Oc \
+     Oo Ar -- Ar KIND Ar NAME Ar VALUE Oo Ar VALUE Ns ... Oc Oc Ns ...
+Takes a list of tuples, each introduced by two dashes (hyphens) and
+specifying rules for handling the value, the placeholder to replace
+in templates, and the value replacing it.
 . Bl -tag -width "" -compact
 .  It Ar KIND
 .  Bl -bullet -compact
 .   It
 .    Li program
 .    Bd -ragged -compact
-Check that
+.     Ar NAME
+will be associated with the first
 .     Ar VALUE
-names an executable file.
+which names an executable file.
 If
 .     Ar VALUE
 contains no slash, it is looked up in
 .     Ev $PATH .
-If this check fails,
-.     Nm
-aborts.
+If none of the
+.     Ar VALUE Ns s
+match,
+.     Nm aborts.
 .    Ed
 .   It
 .    Li string
@@ -173,16 +177,16 @@ The entire input script
 .Pq Pa moto.conf :
 .
 .Bd -literal -offset "xx"
-mtc_register_values \\
-  program CC "$(mtc_first_in_path gcc clang)" \\
-  string CFLAGS "-std=c99 -fPIC -Wall -Wextra -Wfatal-errors" \\
-  string CPPFLAGS "-D_POSIX_C_SOURCE=200809L" \\
-  program LD "\\$CC" \\
-  string LDFLAGS "" \\
-  string LIBS "" \\
-  program CRAMCMD "$(mtc_first_in_path cram cram3 cram2)" \\
-  program RST2HTMLCMD "$(mtc_first_in_path rst2html rst2html.py)" \\
-  string RST2HTML --strict
+mtc_register \\
+  -- program CC gcc clang \\
+  -- string CFLAGS "-std=c99 -fPIC -Wall -Wextra -Wfatal-errors" \\
+  -- string CPPFLAGS "-D_POSIX_C_SOURCE=200809L" \\
+  -- program LD "\\$CC" \\
+  -- string LDFLAGS "" \\
+  -- string LIBS "" \\
+  -- program CRAMCMD cram cram3 cram2 \\
+  -- program RST2HTMLCMD rst2html rst2html.py \\
+  -- string RST2HTML --strict
 
 mtc_create_script mk-obj <<-'EOF'
 	#!/bin/sh

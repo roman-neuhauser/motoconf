@@ -13,10 +13,13 @@ test
 
 ::
 
+  $ touch foo
+  $ chmod u+x foo
+  $ PATH="$PWD:$PATH"
   $ cat >moto.conf <<'EOF'
-  > mtc_register_values \
-  >   program  TEST  true \
-  >   string   OPTS  "--rofl --lmao"
+  > mtc_register \
+  >   -- program  ROFL  foo \
+  >   -- string   OPTS  "--rofl --lmao"
   > mtc_populate file
   > EOF
 
@@ -38,6 +41,6 @@ test
     PATH        =  (?!@PATH@).* (re)
     prefix      =  /usr/local
     srcdir      =  .
-    TEST        =  true
+    ROFL        =  /*/foo (glob)
     OPTS        =  --rofl --lmao
 

@@ -32,7 +32,7 @@
      on the command line.  This interface deliberately mimics *autoconf(1)*
      -generated configure scripts.  The input script deliberately deviates
      from *autoconf(1)* being a POSIX *sh(1)* script using `motoconf`-provided
-     functions.  It should open with a call to `mtc_register_values`, and close
+     functions.  It should open with a call to `mtc_register`, and close
      with `mtc_populate Makefile` or equivalent.
 
    `Motoconf Options`
@@ -54,9 +54,9 @@
    `Placeholders`
      Placeholders are @-delimited words (shell parameter names) occurring in
      output file templates.  Placeholder names are registered in the input
-     script with `mtc_register_values`.  Input script containing
+     script with `mtc_register`.  Input script containing
 
-       mtc_register_values string NAME VALUE
+       mtc_register -- string NAME VALUE
 
      instructs `motoconf` to replace, when copying output file templates into
      their destinations, all occurrences of `@NAME@` with `VALUE`.  Builtin
@@ -67,16 +67,16 @@
        $(dirname "$1")
 
    `Functions`
-     `mtc_register_values` KIND NAME VALUE [KIND NAME VALUE]...
-         Takes a list of triplets, each specifying rules for handling the
-         value, the placeholder to replace in templates, and the value replac‐
-         ing it.
+     `mtc_register` -- KIND NAME VALUE [VALUE...] [-- KIND NAME VALUE [VALUE...]]...
+         Takes a list of tuples, each introduced by two dashes (hyphens) and
+         specifying rules for handling the value, the placeholder to replace
+         in templates, and the value replacing it.
 
          `KIND`
            `program`
-             Check that VALUE names an executable file.  If VALUE contains
-             no slash, it is looked up in $PATH.  If this check fails,
-             `motoconf` aborts.
+             `NAME` will be associated with the first `VALUE` which names
+             an executable file.  If VALUE contains no slash, it is looked up
+             in $PATH.  If none of the `VALUE`s match, `motoconf` aborts.
            `string`
              No special processing.
          `NAME`
@@ -102,16 +102,16 @@
   `EXAMPLES`
      The entire input script (moto.conf):
 
-       mtc_register_values \\
-         program CC "$(mtc_first_in_path gcc clang)" \\
-         string CFLAGS "-std=c99 -fPIC -Wall -Wextra -Wfatal-errors" \\
-         string CPPFLAGS "-D_POSIX_C_SOURCE=200809L" \\
-         program LD "\$CC" \\
-         string LDFLAGS "" \\
-         string LIBS "" \\
-         program CRAMCMD "$(mtc_first_in_path cram cram3 cram2)" \\
-         program RST2HTMLCMD "$(mtc_first_in_path rst2html rst2html.py)" \\
-         string RST2HTML --strict
+       mtc_register \\
+         -- program CC gcc clang \\
+         -- string CFLAGS "-std=c99 -fPIC -Wall -Wextra -Wfatal-errors" \\
+         -- string CPPFLAGS "-D_POSIX_C_SOURCE=200809L" \\
+         -- program LD "\$CC" \\
+         -- string LDFLAGS "" \\
+         -- string LIBS "" \\
+         -- program CRAMCMD cram cram3 cram2 \\
+         -- program RST2HTMLCMD rst2html rst2html.py \\
+         -- string RST2HTML --strict
 
        mtc_create_script mk-obj <<-'EOF'
                #!/bin/sh

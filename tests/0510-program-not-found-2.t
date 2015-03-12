@@ -19,7 +19,7 @@ test
 
   $ rm -f file
   $ cat >moto.conf <<'EOF'
-  > mtc_register_values program MEH "$(mtc_first_in_path unlikely)"
+  > mtc_register -- program MEH unlikely
   > mtc_populate file
   > EOF
   $ motoconf moto.conf
@@ -32,7 +32,7 @@ test
 
   $ rm -f file
   $ cat >moto.conf <<'EOF'
-  > mtc_register_values program MEH "$(mtc_first_in_path unlikely1 unlikely2)"
+  > mtc_register -- program MEH unlikely1 unlikely2
   > mtc_populate file
   > EOF
   $ motoconf moto.conf
@@ -49,7 +49,7 @@ test
   $ PATH=$PATH:$PWD
   $ rm -f file
   $ cat >moto.conf <<'EOF'
-  > mtc_register_values program MEH "$(mtc_first_in_path unlikely1 unlikely2 unlikely3)"
+  > mtc_register -- program MEH unlikely1 unlikely2 unlikely3
   > mtc_populate file
   > EOF
   $ motoconf moto.conf

@@ -13,24 +13,33 @@ test
 
 ::
 
+  $ touch foo bar
+  $ chmod u+x foo bar
+
   $ cat >moto.conf <<'EOF'
-  > mtc_register_values program TEST true string OPTS "--omg --wtf"
+  > mtc_register \
+  >   -- program ROFL foo bar \
+  >   -- program LMAO bar foo \
+  >   -- string OPTS "--omg --wtf"
   > mtc_populate file
   > EOF
   $ cat >file.in <<'EOF'
   > PATH=@PATH@
   > prefix=@prefix@
   > srcdir=@srcdir@
-  > TEST=@TEST@
+  > ROFL=@ROFL@
+  > LMAO=@LMAO@
   > OPTS=@OPTS@
   > EOF
 
+  $ PATH=$PWD:$PATH
   $ motoconf moto.conf --help
   Supported variables and their current values:
     PATH        =  (?!@PATH@).* (re)
     prefix      =  /usr/local
     srcdir      =  .
-    TEST        =  true
+    ROFL        =  /*/foo (glob)
+    LMAO        =  /*/bar (glob)
     OPTS        =  --omg --wtf
   $ test -e file
   [1]
@@ -40,7 +49,8 @@ test
     PATH        =  (?!@PATH@).* (re)
     prefix      =  /usr
     srcdir      =  .
-    TEST        =  true
+    ROFL        =  /*/foo (glob)
+    LMAO        =  /*/bar (glob)
     OPTS        =  --omg --wtf
   $ test -e file
   [1]
@@ -50,17 +60,19 @@ test
     PATH        =  (?!@PATH@).* (re)
     prefix      =  /usr
     srcdir      =  .
-    TEST        =  true
+    ROFL        =  /*/foo (glob)
+    LMAO        =  /*/bar (glob)
     OPTS        =  --omg --wtf
   $ test -e file
   [1]
 
-  $ motoconf moto.conf --prefix=/usr --help TEST=false OPTS='--rofl --lmao'
+  $ motoconf moto.conf --prefix=/usr --help ROFL=true OPTS='--rofl --lmao'
   Supported variables and their current values:
     PATH        =  (?!@PATH@).* (re)
     prefix      =  /usr
     srcdir      =  .
-    TEST        =  false
+    ROFL        =  true
+    LMAO        =  /*/bar (glob)
     OPTS        =  --rofl --lmao
   $ test -e file
   [1]

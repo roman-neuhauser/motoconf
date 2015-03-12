@@ -5,13 +5,28 @@ set -eu
 
 _SELF=${0##*/}
 
-mtc_register_values() # {{{
+mtc_register() # {{{
 {
-  while [ $# -gt 2 ]; do
-    mtc_register_$1 "$2" "$3"
-    shift 3
+  local kind i
+  while [ $# -gt 3 ]; do
+    if [ "x$1" != x-- ]; then
+      _mtc_errormsg "mtc_register: expected '--' got '%s'\n" "$1"
+      exit 1
+    fi
+    kind="$2"
+    shift 2
+    mtc_register_$kind "$@"
+    i=0
+    _mtc_find_delim "$@" || i=$?
+    if [ $i -eq 0 ]; then
+      break
+    fi
+    shift $(( i - 1 ))
   done
-
+  _mtc_handle_inputs
+} # }}}
+_mtc_handle_inputs() # {{{
+{
   if [ $_mtc_project_help_wanted -ne 0 ]; then # {{{
     printf "Supported variables and their current values:\n"
     local val var
@@ -30,7 +45,6 @@ mtc_register_values() # {{{
     exit
   fi # }}}
 } # }}}
-
 mtc_register_string() # {{{
 {
   local var="$1" default="$2"
@@ -39,20 +53,39 @@ mtc_register_string() # {{{
 } # }}}
 mtc_register_program() # {{{
 {
-  local var="$1" default="$2"
-  mtc_register_string "$var" "$default"
+  local prog var="$1"
+  shift
+  prog="$(mtc_first_in_path "$@")"
+  mtc_register_string "$var" "$prog"
   _mtc_programs="$_mtc_programs $var"
+} # }}}
+_mtc_find_delim() # {{{
+{
+  local i=0
+  for arg; do
+    i=$(( i + 1 ))
+    if [ "x$arg" = x-- ]; then
+      return $i
+    fi
+  done
+  return 0
 } # }}}
 
 mtc_first_in_path() # {{{
 {
   local dex dir prog pth
   for prog; do
+    if [ "x$prog" = x-- ]; then
+      break
+    fi
     if _mtc_find_prog "$prog"; then
       return
     fi
   done
   for prog; do
+    if [ "x$prog" = x-- ]; then
+      break
+    fi
     _mtc_errormsg "%s: file not found\n" "$prog"
   done
   return 1

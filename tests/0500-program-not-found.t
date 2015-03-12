@@ -23,7 +23,9 @@ test
 
   $ rm -f file
   $ cat >moto.conf <<'EOF'
-  > mtc_register_values program BASE unlikely program FULL /un/li/ke/ly
+  > mtc_register \
+  >   -- program BASE unlikely \
+  >   -- program FULL /un/li/ke/ly
   > mtc_populate file
   > EOF
   $ motoconf moto.conf
@@ -36,7 +38,9 @@ test
 
   $ rm -f file
   $ cat >moto.conf <<'EOF'
-  > mtc_register_values program FULL /un/li/ke/ly program BASE unlikely
+  > mtc_register \
+  >   -- program FULL /un/li/ke/ly \
+  >   -- program BASE unlikely
   > mtc_populate file
   > EOF
   $ motoconf moto.conf
