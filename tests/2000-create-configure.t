@@ -19,7 +19,7 @@ test
   $ cat >moto.conf <<'EOF'
   > mtc_register \
   >   -- program  ROFL  foo \
-  >   -- string   OPTS  "--rofl --lmao"
+  >   -- string   OPTS  --rofl --lmao
   > mtc_populate file
   > EOF
 

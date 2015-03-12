@@ -47,8 +47,19 @@ _mtc_handle_inputs() # {{{
 } # }}}
 mtc_register_string() # {{{
 {
-  local var="$1" default="$2"
-  eval ": \${$var=\"\$default\"}"
+  local val= var="$1"
+  shift
+  for arg; do
+    if [ "x$arg" = x-- ]; then
+      break
+    fi
+    if [ -z "$val" ]; then
+      val="$arg"
+    else
+      val="$val $arg"
+    fi
+  done
+  eval ": \${$var=\"\$val\"}"
   _mtc_variables="$_mtc_variables $var"
 } # }}}
 mtc_register_program() # {{{

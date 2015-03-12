@@ -78,7 +78,8 @@
              an executable file.  If VALUE contains no slash, it is looked up
              in $PATH.  If none of the `VALUE`s match, `motoconf` aborts.
            `string`
-             No special processing.
+             `NAME` will be associated with a string of given `VALUE`s
+             separated by spaces.
          `NAME`
            Placeholder name.
          `VALUE`

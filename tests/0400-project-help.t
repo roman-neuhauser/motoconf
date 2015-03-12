@@ -20,7 +20,7 @@ test
   > mtc_register \
   >   -- program ROFL foo bar \
   >   -- program LMAO bar foo \
-  >   -- string OPTS "--omg --wtf"
+  >   -- string OPTS --omg --wtf
   > mtc_populate file
   > EOF
   $ cat >file.in <<'EOF'
