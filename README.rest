@@ -76,9 +76,9 @@
            `program`
              `NAME` will be associated with the first `VALUE` which names
              an executable file.  If VALUE contains no slash, it is looked up
-             in $PATH.  If none of the `VALUE`s match, `motoconf` aborts.
+             in $PATH.  If none of the `VALUE`\s match, `motoconf` aborts.
            `string`
-             `NAME` will be associated with a string of given `VALUE`s
+             `NAME` will be associated with a string of given `VALUE`\s
              separated by spaces.
          `NAME`
            Placeholder name.
