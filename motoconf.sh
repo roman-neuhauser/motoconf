@@ -32,7 +32,7 @@ _mtc_handle_inputs() # {{{
     local val var
     for var in $_mtc_variables; do
       eval "val=\"\$$var\""
-      printf '  %-10s  =  %s\n' "$var" "$val"
+      printf '  %-16s  =  %s\n' "$var" "$val"
     done
   fi # }}}
 
@@ -289,13 +289,48 @@ while [ $# -gt 0 ]; do # project-specific stuff {{{
   -v|--verbose)
     _mtc_verbosity=$(( _mtc_verbosity + 1 ))
     ;;
-  --prefix=*)
-    prefix="${1#--prefix=}"
-    ;;
-  --prefix)
-    shift
-    prefix="$1"
-    ;;
+  --prefix=*) prefix="${1#*=}" ;;
+  --prefix) shift; prefix="$1" ;;
+
+  --exec-prefix=*) exec_prefix="${1#*=}" ;;
+  --exec-prefix) shift; exec_prefix="$1" ;;
+
+  --bindir=*) bindir="${1#*=}" ;;
+  --bindir) shift; bindir="$1" ;;
+
+  --sbindir=*) sbindir="${1#*=}" ;;
+  --sbindir) shift; sbindir="$1" ;;
+
+  --libexecdir=*) libexecdir="${1#*=}" ;;
+  --libexecdir) shift; libexecdir="$1" ;;
+
+  --sysconfdir=*) sysconfdir="${1#*=}" ;;
+  --sysconfdir) shift; sysconfdir="$1" ;;
+
+  --sharedstatedir=*) sharedstatedir="${1#*=}" ;;
+  --sharedstatedir) shift; sharedstatedir="$1" ;;
+
+  --localstatedir=*) localstatedir="${1#*=}" ;;
+  --localstatedir) shift; localstatedir="$1" ;;
+
+  --libdir=*) libdir="${1#*=}" ;;
+  --libdir) shift; libdir="$1" ;;
+
+  --includedir=*) includedir="${1#*=}" ;;
+  --includedir) shift; includedir="$1" ;;
+
+  --datadir=*) datadir="${1#*=}" ;;
+  --datadir) shift; datadir="$1" ;;
+
+  --mandir=*) mandir="${1#*=}" ;;
+  --mandir) shift; mandir="$1" ;;
+
+  --program-prefix=*) program_prefix="${1#*=}" ;;
+  --program-prefix) shift; program_prefix="$1" ;;
+
+  --program-suffix=*) program_suffix="${1#*=}" ;;
+  --program-suffix) shift; program_suffix="$1" ;;
+
   -*)
     _mtc_errormsg "unknown option: %s\n" "$1"
     _mtc_usage 1
@@ -307,12 +342,74 @@ while [ $# -gt 0 ]; do # project-specific stuff {{{
   esac
   shift
 done # }}}
-# }}}
 
 srcdir="$(dirname "$mtc_input")"
+# }}}
 
-_mtc_variables="PATH prefix srcdir"
+# assign --whateverdir paths {{{
+: ${exec_prefix:=$prefix}
+: ${bindir:=${exec_prefix}/bin}
+: ${sbindir:=${exec_prefix}/sbin}
+: ${libexecdir:=${exec_prefix}/libexec}
+: ${datarootdir:=${prefix}/share}
+: ${datadir:=${datarootdir}}
+if [ "x${prefix}" = x/usr ]; then
+  : ${sysconfdir:=/etc}
+else
+  : ${sysconfdir:=${prefix}/etc}
+fi
+: ${sharedstatedir:=$prefix/com}
+if [ "x${prefix}" = x/usr ]; then
+  : ${localstatedir:=/var}
+else
+  : ${localstatedir:=${prefix}/var}
+fi
+: ${includedir:=$prefix/include}
+: ${docdir:=$datarootdir/doc}
+: ${infodir:=$datarootdir/info}
+: ${htmldir:=$docdir}
+: ${dvidir:=$docdir}
+: ${pdfdir:=$docdir}
+: ${psdir:=$docdir}
+: ${libdir:=$exec_prefix/lib}
+: ${localedir:=$datarootdir/locale}
+: ${mandir:=$datarootdir/man}
+
+: ${program_prefix:=}
+: ${program_suffix:=}
+# }}}
+
+# substitutions {{{
+_mtc_variables="
+  PATH
+  srcdir
+
+  prefix
+  exec_prefix
+  bindir
+  sbindir
+  libexecdir
+  datarootdir
+  datadir
+  sysconfdir
+  sharedstatedir
+  localstatedir
+  includedir
+  docdir
+  infodir
+  htmldir
+  dvidir
+  pdfdir
+  psdir
+  libdir
+  localedir
+  mandir
+
+  program_prefix
+  program_suffix
+"
 _mtc_programs=""
+# }}}
 
 # ================================================
 

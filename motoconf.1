@@ -19,10 +19,10 @@
 .Fl c Ar INPUT
 .Nm
 .Ar INPUT
-.Op Fl \-prefix Ns = Ns Ar PFX
+.Op project-options
 .Op Ar NAME Ns = Ns Ar VALUE Ns ...
 .Nm configure
-.Op Fl \-prefix Ns = Ns Ar PFX
+.Op project-options
 .Op Ar NAME Ns = Ns Ar VALUE Ns ...
 .\" SYNOPSIS }}}
 .
@@ -72,19 +72,111 @@ These options, if provided, must come after the
 .Ar INPUT
 argument.
 .Bl -tag -width "xx"
-.It Fl \-prefix Ns Li = Ns Ar PFX
-Install files under
-.Pa PFX
-instead of the default
+.It Fl \-prefix           Ns Li = Ns Ar DIR , \
+    Fl \-exec-prefix      Ns Li = Ns Ar DIR , \
+    Fl \-bindir           Ns Li = Ns Ar DIR , \
+    Fl \-sbindir          Ns Li = Ns Ar DIR , \
+    Fl \-libexecdir       Ns Li = Ns Ar DIR , \
+    Fl \-datarootdir      Ns Li = Ns Ar DIR , \
+    Fl \-datadir          Ns Li = Ns Ar DIR , \
+    Fl \-sysconfdir       Ns Li = Ns Ar DIR , \
+    Fl \-sharedstatedir   Ns Li = Ns Ar DIR , \
+    Fl \-localstatedir    Ns Li = Ns Ar DIR , \
+    Fl \-includedir       Ns Li = Ns Ar DIR , \
+    Fl \-docdir           Ns Li = Ns Ar DIR , \
+    Fl \-infodir          Ns Li = Ns Ar DIR , \
+    Fl \-htmldir          Ns Li = Ns Ar DIR , \
+    Fl \-dvidir           Ns Li = Ns Ar DIR , \
+    Fl \-pdfdir           Ns Li = Ns Ar DIR , \
+    Fl \-psdir            Ns Li = Ns Ar DIR , \
+    Fl \-libdir           Ns Li = Ns Ar DIR , \
+    Fl \-localedir        Ns Li = Ns Ar DIR , \
+    Fl \-mandir           Ns Li = Ns Ar DIR
+These options specify values of placeholders which define
+various installation paths for the configured package.
+The placeholder names are constructed by stripping the leading
+dashes and replacing any inner dashes with underscores.
+For example,
+.Fl \-exec-prefix Ns Li = Ns Pa /snafu
+sets the
+.Li exec_prefix
+placeholder to
+.Pa /snafu .
+.Pp
+As in
+.Nm autoconf ,
+most of these directories are defined,
+by default, in terms of
+.Va $prefix ,
+.Va $exec_prefix ,
+and their subdirectories.
+.Pp
+As opposed to Autoconf ,
+the default values are expanded eagerly, eg. when
+.Va prefix Ns Li ='/snafu'
+then
+.Va includedir Ns Li ='/snafu/include'
+rather than
+.Li '${prefix}/include' .
+.Pp
+Default value of
+.Va $prefix
+is
 .Pa /usr/local .
-Sets
-.Li @prefix@ .
+.Pp
+.Fl \-sysconfdir
+defaults to
+.Va $prefix Ns Pa /etc ;
+when
+.Va $prefix
+is
+.Pa /usr ,
+the default is
+.Pa /etc .
+.Pp
+.Fl \-localstatedir
+defaults to
+.Va $prefix Ns Pa /var ;
+when
+.Va $prefix
+is
+.Pa /usr ,
+the default is
+.Pa /var .
+.Pp
+.Fl \-docdir
+defaults to
+.Va $datarootdir Ns Pa /doc .
 .El
 .Ss Placeholders
 Placeholders are
 .Li @ Ns -delimited
 words (shell parameter names) occurring in output file templates.
-Placeholder names are registered in the input script with
+.Pp
+Builtin placeholders are
+.Li PATH ,
+.Li srcdir ,
+plus those defined by
+.Fl \-prefix
+and related options.
+.Li @PATH@
+is substituted with the value of
+.Ev $PATH ,
+.Li @srcdir@
+is substituted with the result of
+.Bd -literal -offset "xx"
+$(dirname "$1")
+
+.Ed
+.Li @prefix@
+is substituted with the value given with
+.Fl \-prefix ,
+.Li @bindir@
+is substituted with the value given with
+.Fl \-bindir ,
+and so on.
+.Pp
+Custom placeholder names are registered in the input script with
 .Ic mtc_register .
 Input script containing
 .Bd -literal -offset "xx"
@@ -98,24 +190,6 @@ all occurrences of
 .Li @NAME@
 with
 .Li VALUE .
-.
-Builtin placeholders are
-.Li PATH ,
-.Li prefix ,
-and
-.Li srcdir .
-.Li @PATH@
-is substituted with the value of
-.Ev $PATH ,
-.Li @prefix@
-is substituted with the value given with
-.Fl \-prefix ,
-and
-.Li @srcdir@
-is substituted with the result of
-.Bd -literal -offset "xx"
-$(dirname "$1")
-.Ed
 .
 .Ss Functions
 .Bl -tag -width "xx"

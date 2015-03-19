@@ -38,9 +38,30 @@ test
   $ test -x configure
   $ ./configure --help
   Supported variables and their current values:
-    PATH        =  (?!@PATH@).* (re)
-    prefix      =  /usr/local
-    srcdir      =  .
-    ROFL        =  /*/foo (glob)
-    OPTS        =  --rofl --lmao
+    PATH              =  * (glob)
+    srcdir            =  .
+    prefix            =  /usr/local
+    exec_prefix       =  /usr/local
+    bindir            =  /usr/local/bin
+    sbindir           =  /usr/local/sbin
+    libexecdir        =  /usr/local/libexec
+    datarootdir       =  /usr/local/share
+    datadir           =  /usr/local/share
+    sysconfdir        =  /usr/local/etc
+    sharedstatedir    =  /usr/local/com
+    localstatedir     =  /usr/local/var
+    includedir        =  /usr/local/include
+    docdir            =  /usr/local/share/doc
+    infodir           =  /usr/local/share/info
+    htmldir           =  /usr/local/share/doc
+    dvidir            =  /usr/local/share/doc
+    pdfdir            =  /usr/local/share/doc
+    psdir             =  /usr/local/share/doc
+    libdir            =  /usr/local/lib
+    localedir         =  /usr/local/share/locale
+    mandir            =  /usr/local/share/man
+    program_prefix    =  
+    program_suffix    =  
+    ROFL              =  */foo (glob)
+    OPTS              =  --rofl --lmao
 

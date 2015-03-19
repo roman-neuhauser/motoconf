@@ -21,8 +21,8 @@
   `SYNOPSIS`
      `motoconf` -h | --help
      `motoconf` -c INPUT
-     `motoconf` INPUT [--prefix=PFX] [NAME=VALUE...]
-     `configure` [--prefix=PFX] [NAME=VALUE...]
+     `motoconf` INPUT [project-options] [NAME=VALUE...]
+     `configure` [project-options] [NAME=VALUE...]
 
   `DESCRIPTION`
      `motoconf` is a simple build configuration tool influenced by *autoconf(1)*.
@@ -47,24 +47,56 @@
    `Project Options`
      These options, if provided, must come after the `INPUT` argument.
 
-     `--prefix=PFX`
-         Install files under `PFX` instead of the default `/usr/local`.
-         Sets `@prefix@`.
+     `--prefix=DIR`, `--exec-prefix=DIR`, `--bindir=DIR`, `--sbindir=DIR`,
+     `--libexecdir=DIR`, `--datarootdir=DIR`, `--datadir=DIR`,
+     `--sysconfdir=DIR`, `--sharedstatedir=DIR`, `--localstatedir=DIR`,
+     `--includedir=DIR`, `--docdir=DIR`, `--infodir=DIR`, `--htmldir=DIR`,
+     `--dvidir=DIR`, `--pdfdir=DIR`, `--psdir=DIR`, `--libdir=DIR`,
+     `--localedir=DIR`, `--mandir=DIR`
+         These options specify values of placeholders which define various
+         installation paths for the configured package.  The placeholder names
+         are constructed by stripping the leading dashes and replacing any
+         inner dashes with underscores.  For example, `--exec-prefix=/snafu`
+         sets the `exec_prefix` placeholder to `/snafu`.
+
+         As in Autoconf, most of these directories are defined, by default,
+         in terms of `$prefix`, `$exec_prefix`, and their subdirectories.
+
+         As opposed to Autoconf , the default values are expanded eagerly,
+         eg. when `prefix='/snafu'` then `includedir='/snafu/include'`
+         rather than `'${prefix}/include'`.
+
+         Default value of `$prefix` is `/usr/local`.
+
+         `--sysconfdir` defaults to `$prefix/etc`; when `$prefix` is `/usr`,
+         the default is `/etc`.
+
+         `--localstatedir` defaults to `$prefix/var`; when `$prefix` is
+         `/usr`, the default is `/var`.
+
+         `--docdir` defaults to `$datarootdir/doc`.
 
    `Placeholders`
      Placeholders are @-delimited words (shell parameter names) occurring in
-     output file templates.  Placeholder names are registered in the input
-     script with `mtc_register`.  Input script containing
+     output file templates.
+
+     Builtin placeholders are `PATH`, `srcdir`, plus those defined by
+     `--prefix` and related options.  `@PATH@` is substituted with the value
+     of `$PATH`, `@srcdir@` is substituted with the result of
+
+       $(dirname "$1")
+
+     `@prefix@` is substituted with the value given with `--prefix`,
+     `@bindir@` is substituted with the value given with `--bindir`,
+     and so on.
+
+     Custom placeholder names are registered in the input script with
+     `mtc_register`.  Input script containing
 
        mtc_register -- string NAME VALUE
 
      instructs `motoconf` to replace, when copying output file templates into
-     their destinations, all occurrences of `@NAME@` with `VALUE`.  Builtin
-     placeholders are `PATH`, `prefix`, and `srcdir`.  `@PATH@` is substituted
-     with the value of `$PATH`, `@prefix@` is substituted with the value given
-     with `--prefix`, and `@srcdir@` is substituted with the result of
-
-       $(dirname "$1")
+     their destinations, all occurrences of `@NAME@` with `VALUE`.
 
    `Functions`
      `mtc_register` -- KIND NAME VALUE [VALUE...] [-- KIND NAME VALUE [VALUE...]]...
