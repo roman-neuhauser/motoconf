@@ -279,6 +279,9 @@ while [ $# -gt 0 ]; do # motoconf options {{{
   --help)
     _mtc_help
   ;;
+  -v|--verbose)
+    _mtc_verbosity=$(( _mtc_verbosity + 1 ))
+  ;;
   -*)
     _mtc_errormsg "unknown option: %s\n" "$1"
     _mtc_usage 1
@@ -305,9 +308,6 @@ while [ $# -gt 0 ]; do # project-specific stuff {{{
     ;;
   -h|--help)
     _mtc_project_help_wanted=1
-    ;;
-  -v|--verbose)
-    _mtc_verbosity=$(( _mtc_verbosity + 1 ))
     ;;
   --prefix=*) prefix="${1#*=}" ;;
   --prefix) shift; prefix="$1" ;;
