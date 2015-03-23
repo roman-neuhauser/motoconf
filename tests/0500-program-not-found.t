@@ -12,14 +12,14 @@ setup
   > PATH=@PATH@
   > prefix=@prefix@
   > srcdir=@srcdir@
-  > BASE=@BASE@
-  > FULL=@FULL@
+  > _1ST=@BASE@
+  > _2ND=@FULL@
   > EOF
 
   $ cat >moto.conf <<'EOF'
   > mtc_register \
-  >   -- program BASE unlikely \
-  >   -- program FULL /un/li/ke/ly
+  >   -- program _1ST unlikely1 \
+  >   -- program _2ND unlikely2
   > mtc_populate file
   > EOF
 
@@ -33,22 +33,22 @@ test
 ::
 
   $ motoconf moto.conf
-  motoconf: unlikely: file not found
+  motoconf: unlikely1: file not found
   [1]
   $ test -e file
   [1]
 
 ::
 
-  $ touch unlikely
-  $ chmod u+x unlikely
+  $ touch unlikely1
+  $ chmod u+x unlikely1
   $ PATH=$PATH:$PWD
   $ rm -f file
 
 ::
 
   $ motoconf moto.conf
-  motoconf: /un/li/ke/ly: file not found
+  motoconf: unlikely2: file not found
   [1]
   $ test -e file
   [1]
