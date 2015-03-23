@@ -54,4 +54,4 @@ test
   > EOF
   $ motoconf moto.conf
   $ cat file
-  MEH=.*/unlikely2 (re)
+  MEH=/*/unlikely2 (glob)
