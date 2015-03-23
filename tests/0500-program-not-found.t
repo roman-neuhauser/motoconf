@@ -16,18 +16,22 @@ setup
   > FULL=@FULL@
   > EOF
 
-test
-****
-
-::
-
-  $ rm -f file
   $ cat >moto.conf <<'EOF'
   > mtc_register \
   >   -- program BASE unlikely \
   >   -- program FULL /un/li/ke/ly
   > mtc_populate file
   > EOF
+
+test
+****
+
+::
+
+  $ rm -f file
+
+::
+
   $ motoconf moto.conf
   motoconf: unlikely: file not found
   [1]
@@ -36,13 +40,13 @@ test
 
 ::
 
+  $ touch unlikely
+  $ chmod u+x unlikely
+  $ PATH=$PATH:$PWD
   $ rm -f file
-  $ cat >moto.conf <<'EOF'
-  > mtc_register \
-  >   -- program FULL /un/li/ke/ly \
-  >   -- program BASE unlikely
-  > mtc_populate file
-  > EOF
+
+::
+
   $ motoconf moto.conf
   motoconf: /un/li/ke/ly: file not found
   [1]
