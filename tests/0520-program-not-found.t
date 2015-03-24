@@ -18,8 +18,8 @@ setup
 
   $ cat >moto.conf <<EOF
   > mtc_register \
-  >   -- program _1ST unlikely1 \
-  >   -- program _2ND unlikely2
+  >   -- program _1ST $PWD/unlikely1 \
+  >   -- program _2ND $PWD/unlikely2
   > mtc_populate file
   > EOF
 
@@ -33,7 +33,7 @@ test
 ::
 
   $ motoconf moto.conf
-  motoconf: unlikely1: file not found
+  motoconf: /*/unlikely1: file not found (glob)
   [1]
   $ test -e file
   [1]
@@ -48,7 +48,7 @@ test
 ::
 
   $ motoconf moto.conf
-  motoconf: unlikely2: file not found
+  motoconf: /*/unlikely2: file not found (glob)
   [1]
   $ test -e file
   [1]

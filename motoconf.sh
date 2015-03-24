@@ -104,6 +104,14 @@ mtc_first_in_path() # {{{
 _mtc_find_prog() # {{{
 {
   local dex dir prog="$1" pth="$PATH"
+  case $prog in
+  /*)
+    if [ -f "$prog" -a -x "$prog" ]; then
+      printf "%s" "$prog"
+      return
+    fi
+  ;;
+  esac
   while :; do
     dir="${pth%%:*}"
     pth="${pth#*:}"
