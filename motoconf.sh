@@ -27,7 +27,15 @@ mtc_register() # {{{
 } # }}}
 _mtc_handle_inputs() # {{{
 {
+  local prog
+  for prog in $_mtc_programs; do
+    mtc_check_program $prog
+  done
+
   if [ $_mtc_project_help_wanted -ne 0 ]; then # {{{
+    if [ $_mtc_verbosity -gt 0 ]; then
+      printf "\n"
+    fi
     printf "Supported variables and their current values:\n"
     local val var
     for var in $_mtc_variables; do
@@ -35,11 +43,6 @@ _mtc_handle_inputs() # {{{
       printf '  %-16s  =  %s\n' "$var" "$val"
     done
   fi # }}}
-
-  local prog
-  for prog in $_mtc_programs; do
-    mtc_check_program $prog
-  done
 
   if [ $_mtc_project_help_wanted -ne 0 ]; then # {{{
     exit
