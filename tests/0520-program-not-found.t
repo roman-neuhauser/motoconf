@@ -34,6 +34,7 @@ test
 
   $ motoconf moto.conf
   motoconf: /*/unlikely1: file not found (glob)
+  motoconf: /*/unlikely2: file not found (glob)
   [1]
   $ test -e file
   [1]

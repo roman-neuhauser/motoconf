@@ -27,13 +27,16 @@ mtc_register() # {{{
 } # }}}
 _mtc_handle_inputs() # {{{
 {
-  local prog
-  for prog in $_mtc_programs; do
-    mtc_check_program $prog
-  done
+  local failed=0 prog
+
+  for prog in $_mtc_programs; do # {{{
+    if ! mtc_check_program $prog; then
+      failed=1
+    fi
+  done # }}}
 
   if [ $_mtc_project_help_wanted -ne 0 ]; then # {{{
-    if [ $_mtc_verbosity -gt 0 ]; then
+    if [ $failed -ne 0 ] || [ $_mtc_verbosity -gt 0 ]; then
       printf "\n"
     fi
     printf "Supported variables and their current values:\n"
@@ -42,6 +45,10 @@ _mtc_handle_inputs() # {{{
       eval "val=\"\$$var\""
       printf '  %-16s  =  %s\n' "$var" "$val"
     done
+  fi # }}}
+
+  if [ $failed -ne 0 ]; then # {{{
+    exit $failed
   fi # }}}
 
   if [ $_mtc_project_help_wanted -ne 0 ]; then # {{{
@@ -69,7 +76,7 @@ mtc_register_program() # {{{
 {
   local prog var="$1"
   shift
-  prog="$(mtc_first_in_path "$@")"
+  prog="$(mtc_first_in_path "$@" || :)"
   mtc_register_string "$var" "$prog"
   _mtc_programs="$_mtc_programs $var"
 } # }}}
@@ -145,11 +152,11 @@ _mtc_do_check_program() # {{{
     elif [ -e "$prog" ]; then
       printf "FAIL\n"
       _mtc_errormsg "%s: not runnable\n" "$prog"
-      exit 1
+      return 1
     else
       printf "FAIL\n"
       _mtc_errormsg "%s: file not found\n" "$prog"
-      exit 1
+      return 1
     fi
     ;;
   *)
@@ -160,14 +167,14 @@ _mtc_do_check_program() # {{{
     # not to mention the useless call to _mtc_find_prog.
     if [ -z "$prog" ]; then
       printf "FAIL\n"
-      exit 1
+      return 1
     fi
     if _mtc_find_prog "$prog"; then
       printf "\n"
     else
       printf "FAIL\n"
       _mtc_errormsg "%s: file not found\n" "$prog"
-      exit 1
+      return 1
     fi
     ;;
   esac
