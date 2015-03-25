@@ -169,13 +169,17 @@ mtc_check_program() # {{{
 _mtc_do_check_program() # {{{
 {
   local prog result var="$1"
+  local banner="checking %s ... "
+  local banlen=$((${#banner} + ${#var} - 2))
+  local vallen=$((${COLUMNS:-80} - banlen))
+  local valfmt="%${vallen}s\n"
   eval "prog=\"\$$var\""
-  printf "checking %-16s" "$var ..."
+  printf "$banner" "$var"
   if result="$(mtc_first_in_path $prog)"; then
     eval "$var=\"\$result\""
-    printf "%s\n" "$result"
+    printf "$valfmt" "$result"
   else
-    printf "FAIL\n"
+    printf "$valfmt" FAIL
     _mtc_program_not_found $var $prog
     eval "$var="
     return 1

@@ -33,9 +33,9 @@ test
 ::
 
   $ motoconf moto.conf --help
-  checking _1ST ...        FAIL
+  checking _1ST ...                                                           FAIL
   motoconf: _1ST: unlikely1: file not found
-  checking _2ND ...        FAIL
+  checking _2ND ...                                                           FAIL
   motoconf: _2ND: unlikely2: file not found
   
   Supported variables and their current values:
@@ -79,8 +79,8 @@ test
 ::
 
   $ motoconf moto.conf --help
-  checking _1ST ...        */unlikely1 (glob)
-  checking _2ND ...        FAIL
+  checking _1ST ... */unlikely1 (glob)
+  checking _2ND ...                                                           FAIL
   motoconf: _2ND: unlikely2: file not found
   
   Supported variables and their current values:
