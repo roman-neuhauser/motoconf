@@ -23,6 +23,7 @@ test
   > EOF
 
   $ motoconf moto.conf
+  populating file
   $ cat file
   PATH=(?!@PATH@).* (re)
   prefix=/usr/local
@@ -30,6 +31,7 @@ test
   $ rm file
 
   $ motoconf moto.conf --prefix=/usr
+  populating file
   $ cat file
   PATH=(?!@PATH@).* (re)
   prefix=/usr

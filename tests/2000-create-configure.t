@@ -37,6 +37,8 @@ test
   $ test -e configure
   $ test -x configure
   $ ./configure --help
+  checking ROFL ...        */foo (glob)
+  
   Supported variables and their current values:
     PATH              =  * (glob)
     srcdir            =  .

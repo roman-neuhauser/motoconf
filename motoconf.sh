@@ -252,7 +252,7 @@ EOF
 } # }}}
 
 _mtc_project_help_wanted=0
-_mtc_verbosity=0
+_mtc_verbosity=1
 prefix=/usr/local
 
 # process arguments {{{

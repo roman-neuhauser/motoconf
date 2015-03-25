@@ -34,6 +34,9 @@ test
 
   $ PATH=$PWD:$PATH
   $ motoconf moto.conf --help
+  checking ROFL ...        */foo (glob)
+  checking LMAO ...        */bar (glob)
+  
   Supported variables and their current values:
     PATH              =  * (glob)
     srcdir            =  .
@@ -66,6 +69,9 @@ test
   [1]
 
   $ motoconf moto.conf --help --prefix=/usr
+  checking ROFL ...        */foo (glob)
+  checking LMAO ...        */bar (glob)
+  
   Supported variables and their current values:
     PATH              =  * (glob)
     srcdir            =  .
@@ -98,6 +104,9 @@ test
   [1]
 
   $ motoconf moto.conf --prefix=/usr --help
+  checking ROFL ...        */foo (glob)
+  checking LMAO ...        */bar (glob)
+  
   Supported variables and their current values:
     PATH              =  * (glob)
     srcdir            =  .
@@ -130,6 +139,9 @@ test
   [1]
 
   $ motoconf moto.conf --prefix=/usr --help ROFL=true OPTS='--rofl --lmao'
+  checking ROFL ...        */true (glob)
+  checking LMAO ...        */bar (glob)
+  
   Supported variables and their current values:
     PATH              =  * (glob)
     srcdir            =  .

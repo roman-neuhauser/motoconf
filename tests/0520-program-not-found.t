@@ -33,8 +33,10 @@ test
 ::
 
   $ motoconf moto.conf
-  motoconf: _1ST: /*/unlikely1: file not found (glob)
-  motoconf: _2ND: /*/unlikely2: file not found (glob)
+  checking _1ST ...        FAIL
+  motoconf: */unlikely1: file not found (glob)
+  checking _2ND ...        FAIL
+  motoconf: */unlikely2: file not found (glob)
   [1]
   $ test -e file
   [1]
@@ -49,7 +51,9 @@ test
 ::
 
   $ motoconf moto.conf
-  motoconf: _2ND: /*/unlikely2: file not found (glob)
+  checking _1ST ...        */unlikely1 (glob)
+  checking _2ND ...        FAIL
+  motoconf: */unlikely2: file not found (glob)
   [1]
   $ test -e file
   [1]

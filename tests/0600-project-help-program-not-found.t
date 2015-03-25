@@ -33,8 +33,10 @@ test
 ::
 
   $ motoconf moto.conf --help
-  motoconf: _1ST: unlikely1: file not found (glob)
-  motoconf: _2ND: unlikely2: file not found (glob)
+  checking _1ST ...        FAIL
+  motoconf: _1ST: unlikely1: file not found
+  checking _2ND ...        FAIL
+  motoconf: _2ND: unlikely2: file not found
   
   Supported variables and their current values:
     PATH              =  * (glob)
@@ -77,7 +79,9 @@ test
 ::
 
   $ motoconf moto.conf --help
-  motoconf: _2ND: unlikely2: file not found (glob)
+  checking _1ST ...        */unlikely1 (glob)
+  checking _2ND ...        FAIL
+  motoconf: _2ND: unlikely2: file not found
   
   Supported variables and their current values:
     PATH              =  * (glob)

@@ -23,6 +23,7 @@ test
   > mtc_populate file
   > EOF
   $ motoconf moto.conf
+  checking MEH ...         FAIL
   motoconf: MEH: unlikely: file not found
   [1]
   $ test -e file
@@ -36,6 +37,7 @@ test
   > mtc_populate file
   > EOF
   $ motoconf moto.conf
+  checking MEH ...         FAIL
   motoconf: MEH: unlikely1: file not found
   motoconf: MEH: unlikely2: file not found
   [1]
@@ -53,5 +55,7 @@ test
   > mtc_populate file
   > EOF
   $ motoconf moto.conf
+  checking MEH ...         */unlikely2 (glob)
+  populating file
   $ cat file
   MEH=/*/unlikely2 (glob)
