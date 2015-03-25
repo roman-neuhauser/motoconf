@@ -155,7 +155,7 @@ test
     mandir            =  /usr/share/man
     program_prefix    =  
     program_suffix    =  
-    ROFL              =  true
+    ROFL              =  */true (glob)
     LMAO              =  */bar (glob)
     OPTS              =  --rofl --lmao
   $ test -e file

@@ -76,8 +76,7 @@ mtc_register_program() # {{{
 {
   local prog var="$1"
   shift
-  prog="$(mtc_first_in_path "$@" || :)"
-  mtc_register_string "$var" "$prog"
+  mtc_register_string "$var" "$@"
   _mtc_programs="$_mtc_programs $var"
 } # }}}
 _mtc_find_delim() # {{{
@@ -94,7 +93,7 @@ _mtc_find_delim() # {{{
 
 mtc_first_in_path() # {{{
 {
-  local dex dir prog pth
+  local prog
   for prog; do
     if [ "x$prog" = x-- ]; then
       break
@@ -103,13 +102,21 @@ mtc_first_in_path() # {{{
       return
     fi
   done
+  return 1
+} # }}}
+_mtc_program_not_found() # {{{
+{
+  local prog
   for prog; do
     if [ "x$prog" = x-- ]; then
       break
     fi
-    _mtc_errormsg "%s: file not found\n" "$prog"
+    if [ -e "$prog" ]; then
+      _mtc_errormsg "%s: not runnable\n" "$prog"
+    else
+      _mtc_errormsg "%s: file not found\n" "$prog"
+    fi
   done
-  return 1
 } # }}}
 _mtc_find_prog() # {{{
 {
@@ -142,42 +149,18 @@ mtc_check_program() # {{{
 } # }}}
 _mtc_do_check_program() # {{{
 {
-  local prog var="$1"
+  local prog result var="$1"
   eval "prog=\"\$$var\""
   printf "checking %-16s" "$var ..."
-  case "$prog" in
-  /*)
-    if [ -f "$prog" -a -x "$prog" ]; then
-      printf "%s\n" "$prog"
-    elif [ -e "$prog" ]; then
-      printf "FAIL\n"
-      _mtc_errormsg "%s: not runnable\n" "$prog"
-      return 1
-    else
-      printf "FAIL\n"
-      _mtc_errormsg "%s: file not found\n" "$prog"
-      return 1
-    fi
-    ;;
-  *)
-    # if the user-supplied value is the empty string, like in
-    # mtc_register_program FOO "$(mtc_first_in_path foo bar)"
-    # where neither foo nor bar is found, we'll have prog='',
-    # which would yield "motoconf: : file not found\n",
-    # not to mention the useless call to _mtc_find_prog.
-    if [ -z "$prog" ]; then
-      printf "FAIL\n"
-      return 1
-    fi
-    if _mtc_find_prog "$prog"; then
-      printf "\n"
-    else
-      printf "FAIL\n"
-      _mtc_errormsg "%s: file not found\n" "$prog"
-      return 1
-    fi
-    ;;
-  esac
+  if result="$(mtc_first_in_path $prog)"; then
+    eval "$var=\"\$result\""
+    printf "%s\n" "$result"
+  else
+    printf "FAIL\n"
+    _mtc_program_not_found $prog
+    eval "$var="
+    return 1
+  fi
 } # }}}
 mtc_create_script() # {{{
 {
