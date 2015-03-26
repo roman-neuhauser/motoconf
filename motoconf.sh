@@ -8,6 +8,7 @@ _SELF=${0##*/}
 mtc_register() # {{{
 {
   local kind i
+  local kinds="program string"
   while [ $# -gt 3 ]; do
     if [ "x$1" != x-- ]; then
       _mtc_errormsg "mtc_register: expected '--' got '%s'\n" "$1"
@@ -15,14 +16,32 @@ mtc_register() # {{{
     fi
     kind="$2"
     shift 2
+    case $kinds in
+    *$kind*) ;;
+    *)
+      _mtc_errormsg "mtc_register: %s: unknown value kind, expected one of: %s\n" \
+	"$kind" \
+	"$kinds"
+      return 1
+    ;;
+    esac
     mtc_register_$kind "$@"
     i=0
     _mtc_find_delim "$@" || i=$?
     if [ $i -eq 0 ]; then
+      shift $#
       break
     fi
     shift $(( i - 1 ))
   done
+  if [ $# -ne 0 ]; then
+    if [ "x$1" == x-- ]; then
+      _mtc_errormsg "mtc_register: incomplete spec: %s\n" "$*"
+    else
+      _mtc_errormsg "mtc_register: malformed spec: %s\n" "$*"
+    fi
+    return 1
+  fi
   _mtc_handle_inputs
 } # }}}
 _mtc_handle_inputs() # {{{
