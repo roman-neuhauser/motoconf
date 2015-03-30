@@ -35,7 +35,7 @@ mtc_register() # {{{
     shift $(( i - 1 ))
   done
   if [ $# -ne 0 ]; then
-    if [ "x$1" == x-- ]; then
+    if [ "x$1" = x-- ]; then
       _mtc_errormsg "mtc_register: incomplete spec: %s\n" "$*"
     else
       _mtc_errormsg "mtc_register: malformed spec: %s\n" "$*"
