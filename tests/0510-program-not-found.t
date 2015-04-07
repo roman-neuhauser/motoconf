@@ -23,7 +23,7 @@ test
   > mtc_populate file
   > EOF
   $ motoconf moto.conf
-  motoconf: unlikely: file not found
+  motoconf: MEH: unlikely: file not found
   [1]
   $ test -e file
   [1]
@@ -36,8 +36,8 @@ test
   > mtc_populate file
   > EOF
   $ motoconf moto.conf
-  motoconf: unlikely1: file not found
-  motoconf: unlikely2: file not found
+  motoconf: MEH: unlikely1: file not found
+  motoconf: MEH: unlikely2: file not found
   [1]
   $ test -e file
   [1]

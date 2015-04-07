@@ -33,8 +33,8 @@ test
 ::
 
   $ motoconf moto.conf
-  motoconf: unlikely1: file not found
-  motoconf: unlikely2: file not found
+  motoconf: _1ST: unlikely1: file not found
+  motoconf: _2ND: unlikely2: file not found
   [1]
   $ test -e file
   [1]
@@ -49,7 +49,7 @@ test
 ::
 
   $ motoconf moto.conf
-  motoconf: unlikely2: file not found
+  motoconf: _2ND: unlikely2: file not found
   [1]
   $ test -e file
   [1]

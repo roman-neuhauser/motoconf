@@ -125,15 +125,15 @@ mtc_first_in_path() # {{{
 } # }}}
 _mtc_program_not_found() # {{{
 {
-  local prog
+  local prog var="$1"; shift
   for prog; do
     if [ "x$prog" = x-- ]; then
       break
     fi
     if [ -e "$prog" ]; then
-      _mtc_errormsg "%s: not runnable\n" "$prog"
+      _mtc_errormsg "%s: %s: not runnable\n" "$var" "$prog"
     else
-      _mtc_errormsg "%s: file not found\n" "$prog"
+      _mtc_errormsg "%s: %s: file not found\n" "$var" "$prog"
     fi
   done
 } # }}}
@@ -176,7 +176,7 @@ _mtc_do_check_program() # {{{
     printf "%s\n" "$result"
   else
     printf "FAIL\n"
-    _mtc_program_not_found $prog
+    _mtc_program_not_found $var $prog
     eval "$var="
     return 1
   fi
