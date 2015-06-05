@@ -246,13 +246,15 @@ _mtc_usage() # {{{
 
 _mtc_create_configure() # {{{
 {
-  cat >configure <<-EOF
+  local fname=configure
+  cat >"$fname" <<-EOF
 	#!/bin/sh
 	cfg="$1"
 	dir="\$(dirname "\$0")"
 	exec motoconf "\$dir/\$cfg" "\$@"
 EOF
-  chmod +x configure
+  chmod +x "$fname"
+  printf "created %s\n" "$fname"
 } # }}}
 
 _mtc_project_help_wanted=0

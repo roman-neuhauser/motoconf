@@ -34,6 +34,7 @@ test
   $ test -e configure
   [1]
   $ motoconf -c moto.conf
+  created configure
   $ test -e configure
   $ test -x configure
   $ ./configure --help
