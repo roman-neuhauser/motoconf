@@ -165,9 +165,13 @@ is substituted with the value of
 .Li @srcdir@
 is substituted with the result of
 .Bd -literal -offset "xx"
-$(dirname "$1")
+$(dirname "$mtc_input")
 
 .Ed
+where
+.Ev $mtc_input
+is the path to
+.Ar INPUT ,
 .Li @prefix@
 is substituted with the value given with
 .Fl \-prefix ,
@@ -216,7 +220,8 @@ contains no slash, it is looked up in
 If none of the
 .     Ar VALUE Ns s
 match,
-.     Nm aborts.
+.     Nm
+aborts.
 .    Ed
 .   It
 .    Li string

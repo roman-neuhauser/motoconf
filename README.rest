@@ -84,8 +84,9 @@
      `--prefix` and related options.  `@PATH@` is substituted with the value
      of `$PATH`, `@srcdir@` is substituted with the result of
 
-       $(dirname "$1")
+       $(dirname "$mtc_input")
 
+     where `$mtc_input` is the path to `INPUT`,
      `@prefix@` is substituted with the value given with `--prefix`,
      `@bindir@` is substituted with the value given with `--bindir`,
      and so on.
