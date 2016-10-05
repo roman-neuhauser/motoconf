@@ -15,6 +15,7 @@ INSTALL_DIR    ?= install -m 755 -d
 INSTALL_SCRIPT ?= install -m 755
 RST2HTML       ?= $(call first_in_path,rst2html.py rst2html)
 
+tests           = tests
 name            = motoconf
 
 installed       = $(name).1.gz $(name)
@@ -36,7 +37,7 @@ clean:
 
 .PHONY: check
 check: $(.DEFAULT_GOAL)
-	env -i CRAM="$(CRAM)" PATH="$(PATH):$$PWD/tests:$$PWD" $(CRAMCMD) tests
+	env -i CRAM="$(CRAM)" PATH="$(PATH):$$PWD/tests:$$PWD" $(CRAMCMD) $(tests)
 
 .PHONY: html
 html: README.html
