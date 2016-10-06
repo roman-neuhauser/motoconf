@@ -15,11 +15,18 @@ INSTALL_DIR    ?= install -m 755 -d
 INSTALL_SCRIPT ?= install -m 755
 RST2HTML       ?= $(call first_in_path,rst2html.py rst2html)
 
-tests           = tests
+smandir         = m
+pkgdir          = p
+srcdir          = s
+testdir         = t
+
+tests           = $(testdir)
 name            = motoconf
 
 installed       = $(name).1.gz $(name)
-artifacts       = $(installed) README.html PKGBUILD $(name).spec
+artifacts       = $(installed) $(manpages) README.html PKGBUILD $(name).spec
+
+manpages        = $(name).1
 
 revname         = $(shell git describe --always --first-parent)
 
@@ -42,6 +49,12 @@ check: $(.DEFAULT_GOAL)
 .PHONY: html
 html: README.html
 
+$(manpages): %: $(smandir)/%
+	$(GZIPCMD) -cn $< | tee $@ >/dev/null
+
+.PHONY: man
+man: $(manpages)
+
 .PHONY: install
 install: $(installed)
 	$(INSTALL_DIR) $(DESTDIR)$(BINDIR)
@@ -62,15 +75,15 @@ tarball: .git
 %.html: %.rest
 	$(RST2HTML) --strict $< $@
 
-$(name): $(name).sh
+$(name): $(srcdir)/$(name).sh
 	sed -e '1s,@SHEBANG@,$(call shebang,$(TARGET_SHELL)),' $< | tee $@.tmp >/dev/null
 	$(INSTALL_SCRIPT) $@.tmp $@
 	$(RM) $@.tmp
 
-$(name).spec: $(name).spec.in
+$(name).spec: $(pkgdir)/$(name).spec.in
 	$(call subst_version,^Version:)
 
-PKGBUILD: PKGBUILD.in
+PKGBUILD: $(pkgdir)/PKGBUILD.in
 	$(call subst_version,^pkgver=)
 
 define subst_version
