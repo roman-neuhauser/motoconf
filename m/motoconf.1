@@ -237,16 +237,51 @@ Placeholder name.
 .  It Ar VALUE
 Any string.
 . El
+.
 . It Ic mtc_first_in_path Ar FILE Ns ...
 Takes a list of filenames, and returns the first that could be found in
 .  Ev $PATH .
-.It Ic mtc_create_script Ar FILE
-Takes a pathname and clobbers it with the contents of the standard input.
-Performs placeholder substitutions.
-.It Ic mtc_populate Ar FILE
-Takes a pathname and clobbers it with the contents of
-. Ar FILE Ns .in .
-Performs placeholder substitutions.
+.
+. It Ic mtc_create_script Ar DEST Op SOURCE
+Clobbers
+.  Ar DEST
+with the result of placeholder substitutions
+applied to the contents of
+.  Ar SOURCE
+or the standard input if omitted, and makes
+.  Ar DEST
+executable.
+.
+.  Ar SOURCE
+is understood to be relative to input script's parent directory,
+unless it is
+.  Dq Li - ,
+in whch case the standard input is used, or the pathname
+as given starts with
+.  Dq Li ./ ,
+in which case it is relative to
+.  Ev $PWD .
+.
+. It Ic mtc_populate Ar DEST Op SOURCE
+Clobbers
+.  Ar DEST
+with the result of placeholder substitutions
+applied to the contents of
+.  Ar SOURCE
+or
+.  Dv $srcdir Ns Li / Ns Ar DEST Ns Li .in
+if omitted.
+.
+.  Ar SOURCE
+is understood to be relative to input script's parent directory,
+unless it is
+.  Dq Li - ,
+in whch case the standard input is used, or the pathname
+as given starts with
+.  Dq Li ./ ,
+in which case it is relative to
+.  Ev $PWD .
+. El
 .El
 .\" DESCRIPTION }}}
 .

@@ -122,13 +122,21 @@
          Takes a list of filenames, and returns the first that could be found
          in $PATH.
 
-     `mtc_create_script` FILE
-         Takes a pathname and clobbers it with the contents of the standard
-         input.  Performs placeholder substitutions.
+     `mtc_create_script` DEST [SOURCE]
+         Clobbers `DEST` with the result of placeholder substitutions applied
+         to the contents of `SOURCE` or the standard input if omitted,
+         and makes `DEST` executable.  `SOURCE` is understood to be relative
+         to input script's parent directory, unless it is `-` in which case
+         the standard input is used, or the pathname as given starts with `./`,
+         in which case it is relative to `$PWD`.
 
-     `mtc_populate` FILE
-         Takes a pathname and clobbers it with the contents of FILE.in.  Per‐
-         forms placeholder substitutions.
+     `mtc_populate` DEST [SOURCE]
+         Clobbers `DEST` with the result of placeholder substitutions applied
+         to the contents of `SOURCE` or `$srcdir/DEST.in` if omitted.
+         `SOURCE` is understood to be relative to input script's parent
+         directory, unless it is `-` in whch case the standard input is used,
+         or the pathname as given starts with `./`, in which case it is
+         relative to `$PWD`.
 
   `EXIT STATUS`
      The `motoconf` utility exits 0 on success, and >0 if an error occurs.

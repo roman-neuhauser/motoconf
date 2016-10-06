@@ -187,27 +187,36 @@ _mtc_do_check_program() # {{{
 } # }}}
 mtc_create_script() # {{{
 {
-  local file="$1"
-  _mtc_chatty -vv printf "generating %s\n" "$file"
-  cat > "$file.in"
-  _mtc_chatty -vvv mtc_populate "$file"
-  chmod +x "$file"
-  rm "$file.in"
+  _mtc_chatty -vv printf "generating %s\n" "$1"
+  _mtc_chatty -vvv mtc_populate "$@" -
+  _mtc_chatty -vvv chmod +x "$1"
 } # }}}
 mtc_populate() # {{{
 {
-  local file="$1" seds=""
-  _mtc_chatty -v printf "populating %s\n" "$file"
-  local input="$srcdir/$file.in"
-  if [ -e "$file.in" ]; then
-    input="$file.in"
-  fi
+  local dst="$1" seds=""
+  local src="${2-}"
+
+  case "$src" in
+  /*|../*)
+      _mtc_errormsg "%s: rejected\n" $src
+      exit 1
+  ;;
+  ./*) ;;
+  -)  src=/dev/stdin ;;
+  '') src="$srcdir/$dst.in" ;;
+  *)  [ "$srcdir" = . ] || src="$srcdir/$src" ;;
+  esac
+
+  _mtc_chatty -v printf "populating %s\n" "$dst"
+  _mtc_assert_file "$src"
   local val var
   for var in $_mtc_variables; do
     eval "val=\"\$$var\""
     seds="$seds s@$var@$valg;"
   done
-  sed "$seds" < "$input" > "$file"
+  local tmpf="$(mktemp "$dst.XXXX")"
+  sed "$seds" < "$src" > "$tmpf"
+  mv "$tmpf" "$dst"
 } # }}}
 _mtc_chatty() # {{{
 {
@@ -231,10 +240,11 @@ _mtc_help() # {{{
 } # }}}
 _mtc_assert_file() # {{{
 {
-  [ -f "$1" ] || {
-    _mtc_errormsg "%s: file not found\n" "$1"
-    exit 1
-  }
+  if [ "x$1" = x- ] || [ -f "$1" ] || [ -L "$1" ]; then
+    return
+  fi
+  _mtc_errormsg "%s: file not found\n" "$1"
+  exit 1
 } # }}}
 _mtc_usage() # {{{
 {
